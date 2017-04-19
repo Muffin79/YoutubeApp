@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "139384393870",
+    "project_id": "youtubeapp-163915"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:139384393870:android:c9d905d8883b529e",
+        "android_client_info": {
+          "package_name": "com.example.muffin.youtubeapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "139384393870-phnc05vvbpsfemsb50c7e0t0dlrrqsft.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "139384393870-r12n80mh3iodfbt12qble9i73cfqlbvh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.muffin.youtubeapp",
+            "certificate_hash": "50d2579047a576781de88ee776f15115b06d1b8f"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxAqp8h9ZuKYWY-CUJKE4NMNSSONwlumU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

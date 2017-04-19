@@ -1,0 +1,39 @@
+<resources>
+    <string name="app_name">YoutubeApp</string>
+    <string name="server_client_id">139384393870-phnc05vvbpsfemsb50c7e0t0dlrrqsft.apps.googleusercontent.com</string>
+    <string name="client_secret">a7FsfVozBuCc-RZjzxkyta1Q</string>
+    <string name="youtube_api_key">AIzaSyBRGBdO7hA3Idfe0tP8nbFNF2pGACqK1N4</string>
+    <string name="login">Login</string>
+
+    <!-- Date Util -->
+    <string name="date_util_term_less">less than</string>
+    <string name="date_util_term_a">a</string>
+    <string name="date_util_term_an">an</string>
+
+    <string name="date_util_unit_second">second</string>
+    <string name="date_util_unit_seconds">seconds</string>
+    <string name="date_util_unit_minute">minute</string>
+    <string name="date_util_unit_minutes">minutes</string>
+    <string name="date_util_unit_hour">hour</string>
+    <string name="date_util_unit_hours">hours</string>
+    <string name="date_util_unit_day">day</string>
+    <string name="date_util_unit_days">days</string>
+    <string name="date_util_unit_month">month</string>
+    <string name="date_util_unit_months">months</string>
+    <string name="date_util_unit_year">year</string>
+    <string name="date_util_unit_years">years</string>
+
+    <string name="date_util_prefix_lt">less than a</string>
+    <string name="date_util_prefix_about">about</string>
+    <string name="date_util_prefix_over">over</string>
+    <string name="date_util_prefix_almost">almost</string>
+
+    <string name="date_util_suffix">ago</string>
+    <string name="load_more_btn_text">Load more</string>
+    <string name="title_activity_tab">TabActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="search">Search videos</string>
+    <string name="title_activity_search">SearchActivity</string>
+
+</resources>
