@@ -35,6 +35,7 @@ public class FragmentVideo extends YouTubePlayerFragment implements
         if(!b && videoId != null){
             player.cueVideo(videoId);
         }
+        player.play();
     }
 
     @Override

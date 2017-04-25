@@ -9,8 +9,13 @@
 
     <item
         android:id="@+id/item_login"
-        android:title="@string/login"
+        android:title="@string/sign_in"
         android:icon="@drawable/ic_login_square_arrow_button_outline"
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/item_logout"
+        android:title="@string/sing_out"
+        android:icon="@drawable/ic_sign_out"
         app:showAsAction="ifRoom"/>
 
 </menu>

@@ -1,6 +1,7 @@
 package com.example.muffin.youtubeapp.tasks;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.IOException;
 
@@ -20,5 +21,14 @@ public class GetResponseTask extends AsyncTask<Request,Void, Response> {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    protected void onPostExecute(Response response) {
+        try {
+            Log.d("GetResponseTask",response.body().string());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -22,17 +22,11 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <FrameLayout
+    <fragment
         android:id="@+id/search_fragment_container"
+        class="com.example.muffin.youtubeapp.fragments.FragmentSearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         />
-
-    <com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="@dimen/circular_progress_bar_width"
-        android:layout_height="@dimen/circular_progress_bar_height"
-        android:layout_gravity="center"
-        android:visibility="gone"/>
 
 </LinearLayout>

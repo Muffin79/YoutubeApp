@@ -1,7 +1,9 @@
 package com.example.muffin.youtubeapp.activities;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentManager;
@@ -69,6 +71,7 @@ public class MainActivity extends AppCompatActivity
     private String accessToken;
     private String refreshToken;
     private String tokenType;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,8 +86,10 @@ public class MainActivity extends AppCompatActivity
                     case 0:
                         break;
                     case 1:
+                        getRecommendedVideos();
                         break;
                     case 2:
+                        getLikedVideos();
                         break;
                 }
             }
@@ -116,7 +121,7 @@ public class MainActivity extends AppCompatActivity
         if(savedInstanceState != null){
             fragmentVideo.setVideoId(savedInstanceState.getString(VIDEO_ID_KEY));
         }
-        loadMore = (TextView) findViewById(R.id.btn_load_more);
+       /* loadMore = (TextView) findViewById(R.id.btn_load_more);
         loadMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -124,7 +129,17 @@ public class MainActivity extends AppCompatActivity
             }
         });
         progressBar = (CircleProgressBar)findViewById(R.id.progressBar);
-        getPopularList();
+        progressBar.setColorSchemeColors(Color.RED);*/
+        FragmentManager fm = getSupportFragmentManager();
+        playListFragment = new PlayListFragment();
+        fm.beginTransaction().replace(R.id.fragment_container,playListFragment).commitNow();
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                playListFragment.loadPopularVideo();
+            }
+        },1000);
 
     }
 
@@ -152,6 +167,47 @@ public class MainActivity extends AppCompatActivity
             new LoadPopularVideoTask().execute(request);
         } catch (MalformedURLException e) {
             Log.d(TAG,"Invalid url :" + urlStr);
+            e.printStackTrace();
+        }
+    }
+
+    private void getRecommendedVideos(){
+        String  urlStr = Uri.parse("https://www.googleapis.com/youtube/v3/activities")
+                .buildUpon()
+                .appendQueryParameter("access_token",accessToken)
+                .appendQueryParameter("mine","true")
+                .appendQueryParameter("part","snippet,contentDetails")
+                .appendQueryParameter("maxResults","10")
+                .appendQueryParameter("key",getString(R.string.youtube_api_key))
+                .build().toString();
+        try {
+            URL url = new URL(urlStr);
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+            new GetResponseTask().execute(request);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void getLikedVideos(){
+        String  urlStr = Uri.parse("https://www.googleapis.com/youtube/v3/videos")
+                .buildUpon()
+                .appendQueryParameter("key",getString(R.string.youtube_api_key))
+                .appendQueryParameter("part","snippet")
+                .appendQueryParameter("access_token",accessToken)
+                .appendQueryParameter("myRating","like")
+                .appendQueryParameter("maxResults","10")
+                .build().toString();
+        try {
+            URL url = new URL(urlStr);
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+            new GetResponseTask().execute(request);
+        } catch (MalformedURLException e) {
             e.printStackTrace();
         }
     }
@@ -216,6 +272,10 @@ public class MainActivity extends AppCompatActivity
         switch (item.getItemId()){
             case R.id.item_login:
                 singIn();
+                //item.setVisible(false);
+                break;
+            case R.id.item_logout:
+                Auth.GoogleSignInApi.signOut(apiClient);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -353,6 +413,7 @@ public class MainActivity extends AppCompatActivity
         protected void onPostExecute(Response response) {
             try {
                 String str = response.body().string();
+                Log.d(TAG,"Json str : " + str);
                 playList = gson.fromJson(str,PlayList.class);
                 Log.d(TAG,"Play list size : " + playList.getItems().size());
                 if(fragmentVideo.getVideoId() == null)
