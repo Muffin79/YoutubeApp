@@ -1,6 +1,7 @@
 package com.example.muffin.youtubeapp.GsonModels;
 
 
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -16,4 +17,6 @@ public class PlayList implements Serializable{
     public List<VideoItem> getItems() {
         return items;
     }
+
+
 }

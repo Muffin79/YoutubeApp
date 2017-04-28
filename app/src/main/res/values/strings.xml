@@ -3,7 +3,9 @@
     <string name="server_client_id">139384393870-phnc05vvbpsfemsb50c7e0t0dlrrqsft.apps.googleusercontent.com</string>
     <string name="client_secret">a7FsfVozBuCc-RZjzxkyta1Q</string>
     <string name="youtube_api_key">AIzaSyBRGBdO7hA3Idfe0tP8nbFNF2pGACqK1N4</string>
-    <string name="sign_in">Sign in</string>
+    <string name="pref_str">app_pref</string>
+    <string name="access_token_pref">access_token</string>
+
 
     <!-- Date Util -->
     <string name="date_util_term_less">less than</string>
@@ -29,16 +31,24 @@
     <string name="date_util_prefix_almost">almost</string>
 
     <string name="date_util_suffix">ago</string>
+
+    <!--Strings for bind UI-->
+    <string name="sign_in">Sign in</string>
     <string name="load_more_btn_text">Load more</string>
     <string name="title_activity_tab">TabActivity</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="views_count">%1$s views</string>
+    <string name="publish_on">Published on %1$s</string>
     <string name="search">Search videos</string>
     <string name="title_activity_search">SearchActivity</string>
     <string name="sing_out">Sing out</string>
     <string name="like">Like</string>
     <string name="dislike">Dislike</string>
     <string name="share">Share</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_channel">ChannelActivity</string>
 
 </resources>

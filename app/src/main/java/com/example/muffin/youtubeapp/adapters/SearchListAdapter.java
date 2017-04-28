@@ -2,6 +2,7 @@ package com.example.muffin.youtubeapp.adapters;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +14,9 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.muffin.youtubeapp.GsonModels.SearchItem;
 import com.example.muffin.youtubeapp.R;
+import com.example.muffin.youtubeapp.activities.ChannelActivity;
+import com.example.muffin.youtubeapp.activities.PlaylistActivity;
+import com.example.muffin.youtubeapp.activities.VideoActivity;
 import com.example.muffin.youtubeapp.utils.OnVideoSelectedListener;
 import com.example.muffin.youtubeapp.utils.Utils;
 
@@ -71,7 +75,7 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.Se
             txtChannelName.setText(item.getSnippet().getChannelTitle());
 
             Glide.with(context)
-                    .load(item.getSnippet().getThumbnails().getDefaultThumbnailUrl())
+                    .load(item.getSnippet().getThumbnails().getHighThumbnailUrl())
                     .centerCrop()
                     .placeholder(R.drawable.loading_spinner)
                     .into(imgThumbnail);
@@ -79,7 +83,14 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.Se
 
         @Override
         public void onClick(View v) {
-            callback.onVideoSelected(item.getVideoId());
+            if(item.getId().getKind().equals(Utils.KIND_VIDEO)) {
+                Intent intent = VideoActivity.newIntent(context, item.getId().getVideoId());
+                context.startActivity(intent);
+            }else if(item.getId().getKind().equals(Utils.KIND_CHANNEL)){
+                context.startActivity(ChannelActivity.newIntent(context,item.getId().getChannelId()));
+            }else if(item.getId().getKind().equals(Utils.KIND_PLAYLIST)){
+                context.startActivity(PlaylistActivity.newIntent(context,item.getId().getPlaylistId()));
+            }
         }
     }
 }

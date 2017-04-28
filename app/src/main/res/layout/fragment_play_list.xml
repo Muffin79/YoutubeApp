@@ -1,20 +1,19 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="match_parent">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:background="@color/colorPrimaryDark"
     tools:context="com.example.muffin.youtubeapp.fragments.PlayListFragment">
 
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/play_list_recyclerView"
@@ -26,21 +25,21 @@
                 android:id="@+id/progressBar"
                 android:layout_width="@dimen/circular_progress_bar_width"
                 android:layout_height="@dimen/circular_progress_bar_height"
+                android:layout_marginTop="@dimen/circle_progressBar_marginTop"
                 android:layout_gravity="center"
                 android:visibility="gone"
                 app:mlpb_enable_circle_background="true" />
 
             <TextView
                 android:id="@+id/txt_load_more"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="40dp"
-                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal"
                 android:background="@color/material_background_color"
                 android:text="@string/load_more_btn_text"
                 android:textAlignment="center"
                 android:textColor="@color/text_and_icon_color"
                 android:visibility="gone" />
-        </LinearLayout>
-    </ScrollView>
 
 </LinearLayout>
+</ScrollView>

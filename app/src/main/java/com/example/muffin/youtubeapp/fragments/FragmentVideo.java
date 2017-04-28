@@ -2,22 +2,27 @@ package com.example.muffin.youtubeapp.fragments;
 
 import android.os.Bundle;
 
+import com.example.muffin.youtubeapp.R;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerFragment;
-
-
+import com.google.android.youtube.player.YouTubeThumbnailLoader;
+import com.google.android.youtube.player.YouTubeThumbnailView;
 
 public class FragmentVideo extends YouTubePlayerFragment implements
         YouTubePlayer.OnInitializedListener{
 
     private YouTubePlayer player;
     private String videoId;
+    private String playListId;
+
 
     @Override
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
-        initialize("AIzaSyB__E_VxHmsJ5qw1kvbjLpiEwXvspCJCFI",this);
+        //initialize("AIzaSyB__E_VxHmsJ5qw1kvbjLpiEwXvspCJCFI",this);
+        initialize(getString(R.string.youtube_api_key),this);
+
     }
 
     @Override
@@ -35,6 +40,12 @@ public class FragmentVideo extends YouTubePlayerFragment implements
         if(!b && videoId != null){
             player.cueVideo(videoId);
         }
+
+        if(!b && playListId != null){
+            player.cuePlaylist(playListId);
+        }
+
+
         player.play();
     }
 
@@ -48,6 +59,15 @@ public class FragmentVideo extends YouTubePlayerFragment implements
             this.videoId = videoId;
             if (player != null) {
                 player.cueVideo(videoId);
+            }
+        }
+    }
+
+    public void setPlayListId(String playListId) {
+        if(playListId != null && !playListId.equals(this.playListId)) {
+            this.playListId = playListId;
+            if(player != null){
+                player.cuePlaylist(playListId);
             }
         }
     }

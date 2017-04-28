@@ -16,4 +16,7 @@ public class SearchItem implements Serializable{
         return id.getVideoId();
     }
 
+    public Id getId() {
+        return id;
+    }
 }

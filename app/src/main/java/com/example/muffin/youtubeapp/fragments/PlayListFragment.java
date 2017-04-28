@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 
 import com.example.muffin.youtubeapp.GsonModels.PlayList;
@@ -15,6 +18,7 @@ import com.example.muffin.youtubeapp.R;
 import com.example.muffin.youtubeapp.adapters.PlayListAdapter;
 import com.example.muffin.youtubeapp.tasks.GetResponseTask;
 import com.example.muffin.youtubeapp.utils.OnVideoSelectedListener;
+import com.example.muffin.youtubeapp.utils.Utils;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -35,6 +39,7 @@ public class PlayListFragment extends VideoListFragment {
 
     private int lastPosition = 0;
     private List<VideoItem> videoItems = new ArrayList<>();
+    private boolean loadPop = false;
 
     public static PlayListFragment newInstance(PlayList playList) {
         PlayListFragment fragment = new PlayListFragment();
@@ -43,43 +48,26 @@ public class PlayListFragment extends VideoListFragment {
         fragment.setArguments(args);
         return fragment;
     }
-/*
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setRetainInstance(true);
-    }
+
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_play_list, container, false);
-        playListRecycler = (RecyclerView) v.findViewById(R.id.play_list_recyclerView);
-        playListRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
-        loadMoreTxt = (TextView) v.findViewById(R.id.txt_load_more);
-        progressBar = (CircleProgressBar) v.findViewById(R.id.progressBar);
+        View v = super.onCreateView(inflater,container,savedInstanceState);
 
-        progressBar.setColorSchemeColors(Color.RED);
-
-        adapter = new PlayListAdapter(videoItems, callback);
-        playListRecycler.setAdapter(adapter);
+        if(loadPop){
+            loadPopularVideo();
+        }
 
 
         return v;
     }
 
-    private void startLoadingAnim() {
-        loadMoreTxt.setVisibility(View.GONE);
-        progressBar.setVisibility(View.VISIBLE);
+
+    public void setLoadPop(boolean loadPop) {
+        this.loadPop = loadPop;
     }
-
-    private void endLoadingAnim() {
-        if (nextPageToken != null)
-            loadMoreTxt.setVisibility(View.VISIBLE);
-        progressBar.setVisibility(View.GONE);
-    }*/
-
 
     @Override
     protected RecyclerView.Adapter createAdapter() {
@@ -108,10 +96,29 @@ public class PlayListFragment extends VideoListFragment {
         }
     }
 
+    private void getLikedVideos(){
+        String  urlStr = Uri.parse("https://www.googleapis.com/youtube/v3/videos")
+                .buildUpon()
+                .appendQueryParameter("key",getString(R.string.youtube_api_key))
+                .appendQueryParameter("part","snippet,contentDetails")
+                .appendQueryParameter("access_token", Utils.getAccessToken(getContext()))
+                .appendQueryParameter("myRating","like")
+                .appendQueryParameter("maxResults","10")
+                .build().toString();
+        try {
+            URL url = new URL(urlStr);
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+            new LoadVideoItemTask().execute(request);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void loadNewVideo() {
         startLoadingAnim();
-        Log.d("NextPageToken",nextPageToken);
         String urlStr = uriBuilder
                 .appendQueryParameter("pageToken", nextPageToken)
                 .build().toString();

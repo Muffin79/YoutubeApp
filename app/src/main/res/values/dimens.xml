@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="standard_margin">16dp</dimen>
+    <dimen name="icon_margin">50dp</dimen>
     <dimen name="icon_size">24dp</dimen>
     <!-- Adapter item sizes -->
     <dimen name="thumbnail_width">120dp</dimen>
@@ -23,4 +24,5 @@
     <!-- Circular bar sizes -->
     <dimen name="circular_progress_bar_width">60dp</dimen>
     <dimen name="circular_progress_bar_height">60dp</dimen>
+    <dimen name="circle_progressBar_marginTop">40dp</dimen>
 </resources>

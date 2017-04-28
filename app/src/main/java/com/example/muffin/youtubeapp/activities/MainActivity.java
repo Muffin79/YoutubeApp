@@ -1,12 +1,14 @@
 package com.example.muffin.youtubeapp.activities;
 
+import android.accounts.Account;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
@@ -14,14 +16,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
-import com.example.muffin.youtubeapp.GsonModels.PlayList;
+
 import com.example.muffin.youtubeapp.R;
-import com.example.muffin.youtubeapp.fragments.FragmentVideo;
 import com.example.muffin.youtubeapp.fragments.PlayListFragment;
 import com.example.muffin.youtubeapp.tasks.GetResponseTask;
 import com.example.muffin.youtubeapp.utils.OnVideoSelectedListener;
+import com.example.muffin.youtubeapp.utils.Utils;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -60,14 +61,10 @@ public class MainActivity extends AppCompatActivity
     private GoogleApiClient apiClient;
     private GoogleSignInAccount account;
 
-    private FragmentVideo fragmentVideo;
-    private PlayListFragment playListFragment;
-    private TextView loadMore;
-    private CircleProgressBar progressBar;
+    private ViewPager viewPager;
 
-    private Gson gson = new GsonBuilder().create();
 
-    private PlayList playList;
+
     private String accessToken;
     private String refreshToken;
     private String tokenType;
@@ -78,33 +75,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            //TODO: add actions for tabs
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                switch (tab.getPosition()){
-                    case 0:
-                        break;
-                    case 1:
-                        getRecommendedVideos();
-                        break;
-                    case 2:
-                        getLikedVideos();
-                        break;
-                }
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
-
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestServerAuthCode(getString(R.string.server_client_id))
@@ -117,59 +87,15 @@ public class MainActivity extends AppCompatActivity
                 .addApi(Auth.GOOGLE_SIGN_IN_API,gso)
                 .build();
 
-        fragmentVideo = (FragmentVideo) getFragmentManager().findFragmentById(R.id.fragment_video);
-        if(savedInstanceState != null){
-            fragmentVideo.setVideoId(savedInstanceState.getString(VIDEO_ID_KEY));
-        }
-       /* loadMore = (TextView) findViewById(R.id.btn_load_more);
-        loadMore.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadNewVideo();
-            }
-        });
-        progressBar = (CircleProgressBar)findViewById(R.id.progressBar);
-        progressBar.setColorSchemeColors(Color.RED);*/
-        FragmentManager fm = getSupportFragmentManager();
-        playListFragment = new PlayListFragment();
-        fm.beginTransaction().replace(R.id.fragment_container,playListFragment).commitNow();
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                playListFragment.loadPopularVideo();
-            }
-        },1000);
+        viewPager = (ViewPager)findViewById(R.id.main_viewPager);
+        SectionsPagerAdapter adapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        viewPager.setAdapter(adapter);
+        tabLayout.setupWithViewPager(viewPager);
+
+
 
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(VIDEO_ID_KEY,fragmentVideo.getVideoId());
-    }
-
-    private void getPopularList(){
-        startLoadingAnim();
-        String  urlStr = Uri.parse("https://www.googleapis.com/youtube/v3/videos")
-                .buildUpon()
-                .appendQueryParameter("key",getString(R.string.youtube_api_key))
-                .appendQueryParameter("part","snippet,contentDetails")
-                .appendQueryParameter("chart","mostpopular")
-                .appendQueryParameter("maxResults","10")
-                .build().toString();
-        Log.d(TAG,"Url : " + urlStr);
-        try {
-            URL url = new URL(urlStr);
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
-            new LoadPopularVideoTask().execute(request);
-        } catch (MalformedURLException e) {
-            Log.d(TAG,"Invalid url :" + urlStr);
-            e.printStackTrace();
-        }
-    }
 
     private void getRecommendedVideos(){
         String  urlStr = Uri.parse("https://www.googleapis.com/youtube/v3/activities")
@@ -192,58 +118,9 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private void getLikedVideos(){
-        String  urlStr = Uri.parse("https://www.googleapis.com/youtube/v3/videos")
-                .buildUpon()
-                .appendQueryParameter("key",getString(R.string.youtube_api_key))
-                .appendQueryParameter("part","snippet")
-                .appendQueryParameter("access_token",accessToken)
-                .appendQueryParameter("myRating","like")
-                .appendQueryParameter("maxResults","10")
-                .build().toString();
-        try {
-            URL url = new URL(urlStr);
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
-            new GetResponseTask().execute(request);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-    }
 
-    private void showPopularFragment(){
-        FragmentManager fm = getSupportFragmentManager();
-        playListFragment = (PlayListFragment) fm.findFragmentById(R.id.fragment_container);
-        if(playListFragment == null){
-            playListFragment = PlayListFragment.newInstance(playList);
-            fm.beginTransaction()
-                    .add(R.id.fragment_container,playListFragment).addToBackStack(null)
-                    .commit();
-        }
-    }
 
-    private void loadNewVideo(){
-        startLoadingAnim();
-        String  urlStr = Uri.parse("https://www.googleapis.com/youtube/v3/videos")
-                .buildUpon()
-                .appendQueryParameter("key",getString(R.string.youtube_api_key))
-                .appendQueryParameter("part","snippet,contentDetails")
-                .appendQueryParameter("chart","mostpopular")
-                .appendQueryParameter("maxResults","10")
-                .appendQueryParameter("pageToken",playList.getNextPageToken())
-                .build().toString();
-        Log.d(TAG,"Url : " + urlStr);
-        try {
-            URL url = new URL(urlStr);
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
-            new LoadNewVideosTask().execute(request);
-        }catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -319,6 +196,7 @@ public class MainActivity extends AppCompatActivity
                 try {
                     JSONObject jsonObj = new JSONObject(response.body().string());
                     accessToken = jsonObj.get("access_token").toString();
+                    Utils.writeAccessTokenToPreference(MainActivity.this,accessToken);
                     tokenType = jsonObj.get("token_type").toString();
                     refreshToken = jsonObj.get("id_token").toString();
                 } catch (JSONException e) {
@@ -369,16 +247,6 @@ public class MainActivity extends AppCompatActivity
         startActivityForResult(singInIntent,RC_AUTH_CODE);
     }
 
-    private void startLoadingAnim(){
-        progressBar.setVisibility(View.VISIBLE);
-        loadMore.setVisibility(View.GONE);
-    }
-
-    private void endLoadingAnim(){
-        progressBar.setVisibility(View.GONE);
-        if(playList.getNextPageToken() != null)
-            loadMore.setVisibility(View.VISIBLE);
-    }
 
 
 
@@ -389,40 +257,54 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onVideoSelected(String videoId) {
-        fragmentVideo.setVideoId(videoId);
+        Intent intent = VideoActivity.newIntent(this,videoId);
+        startActivity(intent);
     }
 
-    private class LoadNewVideosTask extends GetResponseTask {
+    private class SectionsPagerAdapter extends FragmentStatePagerAdapter{
+
+        public SectionsPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
         @Override
-        protected void onPostExecute(Response response) {
-            try {
-                playList = gson.fromJson(response.body().string(),PlayList.class);
-                Log.d(TAG,"Play list size : " + playList.getItems().size());
-                if(fragmentVideo.getVideoId() == null)
-                    fragmentVideo.setVideoId(playList.getItems().get(0).getId());
-                playListFragment.addVideoItems(playList.getItems());
-                endLoadingAnim();
-            } catch (IOException e) {
-                e.printStackTrace();
+        public Fragment getItem(int position) {
+            switch (position){
+                case 0:
+                    PlayListFragment fragment = new PlayListFragment();
+                    fragment.setLoadPop(true);
+                    return fragment;
+                case 1:
+                    return ChannelActivity.PlaceholderFragment.newInstance(position);
+                case 2:
+                    return ChannelActivity.PlaceholderFragment.newInstance(position);
+                default:
+                    return ChannelActivity.PlaceholderFragment.newInstance(position);
             }
         }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position){
+                case 0:
+                    return "Popular";
+                case 1:
+                    return "Subscriptons";
+                case 2:
+                    return "Account";
+            }
+            return super.getPageTitle(position);
+        }
+
+        @Override
+        public int getCount() {
+            return 3;
+        }
+
+
+
+
+
     }
 
-    private class LoadPopularVideoTask extends GetResponseTask{
-        @Override
-        protected void onPostExecute(Response response) {
-            try {
-                String str = response.body().string();
-                Log.d(TAG,"Json str : " + str);
-                playList = gson.fromJson(str,PlayList.class);
-                Log.d(TAG,"Play list size : " + playList.getItems().size());
-                if(fragmentVideo.getVideoId() == null)
-                    fragmentVideo.setVideoId(playList.getItems().get(0).getId());
-                showPopularFragment();
-                endLoadingAnim();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
 }

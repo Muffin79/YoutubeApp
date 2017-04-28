@@ -12,8 +12,10 @@ public class Thumbnails implements Serializable{
 
     @SerializedName("default")
     private ThumbnailItem defaultThumbnail;
+    private ThumbnailItem high;
 
     public String getDefaultThumbnailUrl(){
         return defaultThumbnail.getUrl();
     }
+    public String getHighThumbnailUrl(){return high.getUrl();}
 }

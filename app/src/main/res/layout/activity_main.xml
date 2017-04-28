@@ -7,6 +7,7 @@
     android:background="@color/material_background_color"
     android:orientation="vertical"
     tools:context="com.example.muffin.youtubeapp.activities.MainActivity">
+
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
         android:layout_width="match_parent"
@@ -31,63 +32,31 @@
             <android.support.design.widget.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:icon="@drawable/ic_home_black_24dp"
-                />
+                android:icon="@drawable/ic_home_black_24dp" />
 
             <android.support.design.widget.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:icon="@drawable/ic_star_border_black_24dp"/>
+                android:icon="@drawable/ic_star_border_black_24dp" />
 
             <android.support.design.widget.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:icon="@drawable/ic_avatar"/>
+                android:icon="@drawable/ic_avatar" />
 
         </android.support.design.widget.TabLayout>
 
     </android.support.design.widget.AppBarLayout>
 
-    <fragment
-        android:id="@+id/fragment_video"
-        class="com.example.muffin.youtubeapp.fragments.FragmentVideo"
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/main_viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    <FrameLayout
+        android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <FrameLayout
-                android:id="@+id/fragment_container"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
-            <com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar
-                android:id="@+id/progressBar"
-                android:layout_width="@dimen/circular_progress_bar_width"
-                android:layout_height="@dimen/circular_progress_bar_height"
-                android:layout_gravity="center"
-                app:mlpb_enable_circle_background="true"
-                android:visibility="gone"/>
-
-            <TextView
-                android:id="@+id/btn_load_more"
-                android:layout_width="wrap_content"
-                android:textAlignment="center"
-                android:layout_height="40dp"
-                android:layout_gravity="center_horizontal"
-                android:textColor="@color/text_and_icon_color"
-                android:background="@color/material_background_color"
-                android:text="@string/load_more_btn_text"
-                android:visibility="gone" />
-        </LinearLayout>
-    </ScrollView>
 
 
 </LinearLayout>

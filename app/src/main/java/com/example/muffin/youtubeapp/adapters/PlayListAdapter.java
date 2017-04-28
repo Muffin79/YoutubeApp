@@ -85,8 +85,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             txtChannelName.setText(item.getSnippet().getChannelTitle());
 
             Glide.with(context)
-                    .load(item.getSnippet().getThumbnails().getDefaultThumbnailUrl())
-                    .centerCrop()
+                    .load(item.getSnippet().getThumbnails().getHighThumbnailUrl())
                     .placeholder(R.drawable.loading_spinner)
                     .into(imgThumbnail);
         }

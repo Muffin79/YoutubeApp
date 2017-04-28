@@ -3,6 +3,7 @@ package com.example.muffin.youtubeapp.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.example.muffin.youtubeapp.R;
 
@@ -14,6 +15,25 @@ import java.util.Date;
 
 public class Utils {
 
+    public static final String KIND_VIDEO = "youtube#video";
+    public static final String KIND_CHANNEL = "youtube#channel";
+    public static final String KIND_PLAYLIST = "youtube#playlist";
+
+    public static void writeAccessTokenToPreference(Context context,String accessToken){
+        SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.pref_str),
+                Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(context.getString(R.string.access_token_pref),accessToken);
+        editor.commit();
+    }
+
+    public static String getAccessToken(Context context){
+        SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.pref_str),
+                Context.MODE_PRIVATE);
+        return preferences.getString(context.getString(R.string.access_token_pref),"");
+    }
+
+
     public static String formatPublishedDate(Context context, String publishedDate){
         Date result = new Date();
         DateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -24,6 +44,18 @@ public class Utils {
         }
 
         return getTimeAgo(result, context);
+    }
+
+    public static String getFormatedDate(String date){
+        Date result = new Date();
+        DateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        try{
+            result = df1.parse(date);
+            return new SimpleDateFormat("dd-MMMM-yyyy").format(result);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     // Method to get current date

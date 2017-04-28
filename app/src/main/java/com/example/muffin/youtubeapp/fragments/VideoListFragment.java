@@ -68,8 +68,8 @@ public abstract class VideoListFragment extends Fragment{
     }
 
     protected void endLoadingAnim() {
-        if(!nextPageToken.isEmpty())
-            loadMoreTxt.setVisibility(View.VISIBLE);
+        if(nextPageToken != null)
+        loadMoreTxt.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
     }
 

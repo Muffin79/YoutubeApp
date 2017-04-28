@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical"
     tools:context="com.example.muffin.youtubeapp.activities.VideoActivity">
 
     <fragment
@@ -13,82 +13,139 @@
         class="com.example.muffin.youtubeapp.fragments.FragmentVideo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:layout_editor_absoluteY="0dp"
-        tools:layout_editor_absoluteX="8dp" />
-    <TextView
-        android:id="@+id/title_txt"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="0dp" />
+
+    <com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar
+        android:id="@+id/video_activity_progressBar"
+        android:layout_width="@dimen/circular_progress_bar_height"
+        android:layout_height="@dimen/circular_progress_bar_width"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/circle_progressBar_marginTop"
+        app:mlpb_enable_circle_background="true" />
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/title"/>
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/views_txt"
-        android:text="@string/views_count"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/small_text"/>
-
-    <GridLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:columnCount="3"
-        android:layout_gravity="center_horizontal"
-
-        android:rowCount="2">
-        <ImageView
-            android:id="@+id/icon_like"
-            android:src="@drawable/ic_like_black_24dp"
-            android:contentDescription="@string/like"
-            android:layout_column="0"
-            android:layout_row="0"
-            android:layout_width="@dimen/icon_size"
-            android:layout_height="@dimen/icon_size" />
-
-        <ImageView
-            android:id="@+id/icon_dislike"
-            android:src="@drawable/ic_dislike_black_24dp"
-            android:contentDescription="@string/dislike"
-            android:layout_column="1"
-            android:layout_row="0"
-            android:layout_width="@dimen/icon_size"
-            android:layout_height="@dimen/icon_size" />
-
-        <ImageView
-            android:id="@+id/icon_share"
-            android:src="@drawable/ic_share_black_24dp"
-            android:contentDescription="@string/share"
-            android:layout_column="2"
-            android:layout_row="0"
-            android:layout_width="@dimen/icon_size"
-            android:layout_height="@dimen/icon_size" />
-        <TextView
-            android:id="@+id/like_count_txt"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/info_linear_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/small_text"/>
+            android:orientation="vertical"
+            android:visibility="gone">
 
-        <TextView
-            android:id="@+id/dislike_count_txt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/small_text"/>
+            <TextView
+                android:id="@+id/title_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textSize="@dimen/title" />
 
-        <TextView
-            android:text="@string/share"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/small_text"/>
-    </GridLayout>
+            <TextView
+                android:id="@+id/views_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="@dimen/standard_margin"
+                android:layout_marginTop="10dp"
+                android:text="@string/views_count"
+                android:textSize="@dimen/small_text" />
 
-    <TextView
-        android:id="@+id/chanelNameTxt"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="@dimen/subhead"/>
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:columnCount="3"
+                android:rowCount="2">
 
+                <ImageView
+                    android:id="@+id/icon_like"
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:layout_column="0"
+                    android:layout_marginEnd="@dimen/icon_margin"
+                    android:layout_row="0"
+                    android:contentDescription="@string/like"
+                    android:src="@drawable/ic_like_black_24dp" />
 
-    <FrameLayout
-        android:id="@+id/video_list_fragment_container"
+                <ImageView
+                    android:id="@+id/icon_dislike"
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:layout_column="1"
+                    android:layout_marginEnd="@dimen/icon_margin"
+                    android:layout_row="0"
+                    android:contentDescription="@string/dislike"
+                    android:src="@drawable/ic_dislike_black_24dp" />
+
+                <ImageView
+                    android:id="@+id/icon_share"
+                    android:layout_width="@dimen/icon_size"
+                    android:layout_height="@dimen/icon_size"
+                    android:layout_column="2"
+                    android:layout_row="0"
+                    android:contentDescription="@string/share"
+                    android:src="@drawable/ic_share_black_24dp" />
+
+                <TextView
+                    android:id="@+id/like_count_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/icon_margin"
+                    android:textSize="@dimen/small_text" />
+
+                <TextView
+                    android:id="@+id/dislike_count_txt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/icon_margin"
+                    android:textSize="@dimen/small_text" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/share"
+                    android:textSize="@dimen/small_text" />
+            </GridLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_height"
+                android:layout_gravity="bottom"
+                android:layout_marginTop="10dp"
+                android:background="@color/divider_color" />
+
+            <TextView
+                android:id="@+id/chanel_name_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:textSize="@dimen/subhead" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/divider_height"
+                android:background="@color/divider_color" />
+
+            <TextView
+                android:id="@+id/publishedAt_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp" />
+
+            <TextView
+                android:id="@+id/description_txt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <fragment
+        android:id="@+id/fragment_search"
+        class="com.example.muffin.youtubeapp.fragments.FragmentSearch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
