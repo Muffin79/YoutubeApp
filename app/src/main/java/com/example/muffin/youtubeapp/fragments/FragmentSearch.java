@@ -55,14 +55,6 @@ public class FragmentSearch extends VideoListFragment {
         return fragment;
     }
 
-    /*
-    public static FragmentSearch newInstance(String q){
-        FragmentSearch fragment = new FragmentSearch();
-        Bundle args = new Bundle();
-        args.putString(ARG_QUERY,q);
-        fragment.setArguments(args);
-        return fragment;
-    }*/
 
     private List<SearchItem> searchItems = new ArrayList<>();
     private boolean loadChannel = false;

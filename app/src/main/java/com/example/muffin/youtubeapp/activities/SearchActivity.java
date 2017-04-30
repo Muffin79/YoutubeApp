@@ -22,7 +22,7 @@ public class SearchActivity extends AppCompatActivity {
 
     private FragmentSearch fragment;
     private SearchList searchList;
-    private Gson gson = new GsonBuilder().create();
+    //private Gson gson = new GsonBuilder().create();
 
     public static Intent newIntent(Context context,String q){
         Intent intent = new Intent(context,SearchActivity.class);

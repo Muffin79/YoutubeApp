@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity
 
     private GoogleApiClient apiClient;
     private GoogleSignInAccount account;
+    private SectionsPagerAdapter adapter;
 
     private ViewPager viewPager;
 
@@ -68,6 +70,8 @@ public class MainActivity extends AppCompatActivity
     private String accessToken;
     private String refreshToken;
     private String tokenType;
+    private MenuItem signIn;
+    private MenuItem signOut;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +83,7 @@ public class MainActivity extends AppCompatActivity
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestServerAuthCode(getString(R.string.server_client_id))
                 .requestEmail()
-                .requestScopes(new Scope("https://www.googleapis.com/auth/youtube.readonly"))
+                .requestScopes(new Scope("https://www.googleapis.com/auth/youtube"))
                 .build();
 
         apiClient = new GoogleApiClient.Builder(this)
@@ -88,7 +92,8 @@ public class MainActivity extends AppCompatActivity
                 .build();
 
         viewPager = (ViewPager)findViewById(R.id.main_viewPager);
-        SectionsPagerAdapter adapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        adapter = new SectionsPagerAdapter(getSupportFragmentManager());
+
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
 
@@ -125,6 +130,15 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu,menu);
+        signIn = menu.findItem(R.id.item_login);
+        signOut = menu.findItem(R.id.item_logout);
+        if(Utils.getStringFromPrefs(this,Utils.ACCESS_TOKEN_PREF).isEmpty()){
+            signIn.setVisible(true);
+            signOut.setVisible(false);
+        }else{
+            signIn.setVisible(false);
+            signOut.setVisible(true);
+        }
 
         SearchView searchView = (SearchView) menu.findItem(R.id.menu_item_search).getActionView();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -153,9 +167,18 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.item_logout:
                 Auth.GoogleSignInApi.signOut(apiClient);
+                changeSingInItemsVisible();
+                Utils.removeFromPrefs(this,Utils.ACCESS_TOKEN_PREF);
                 break;
+            case R.id.item_refresh:
+                Utils.getNewAccessToken(this);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void changeSingInItemsVisible(){
+        signIn.setVisible(!signIn.isVisible());
+        signOut.setVisible(!signOut.isVisible());
     }
 
     @Override
@@ -165,6 +188,7 @@ public class MainActivity extends AppCompatActivity
             if(result.isSuccess()){
                 account = result.getSignInAccount();
                 String authCode = account.getServerAuthCode();
+                changeSingInItemsVisible();
                 getAccessToken(authCode);
             }
         }
@@ -194,11 +218,15 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 try {
-                    JSONObject jsonObj = new JSONObject(response.body().string());
+                    String str = response.body().string();
+                    JSONObject jsonObj = new JSONObject(str);
+                    Log.d("access_token",str);
                     accessToken = jsonObj.get("access_token").toString();
-                    Utils.writeAccessTokenToPreference(MainActivity.this,accessToken);
+                    Utils.writeStringToPrefs(MainActivity.this,Utils.ACCESS_TOKEN_PREF,accessToken);
                     tokenType = jsonObj.get("token_type").toString();
-                    refreshToken = jsonObj.get("id_token").toString();
+                    refreshToken = jsonObj.get("refresh_token").toString();
+                    Utils.writeStringToPrefs(MainActivity.this,Utils.REFRESH_TOKEN_PREF,refreshToken);
+                    adapter.notifyAll();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -207,37 +235,7 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    private void getNewAccessToken(){
-        OkHttpClient client = new OkHttpClient();
-        RequestBody requestBody = new FormBody.Builder()
-                .add("refresh_token",refreshToken)
-                .add("client_id", getString(R.string.server_client_id))
-                .add("client_secret", getString(R.string.client_secret))
-                .add("grant_type", "refresh_token")
-                .build();
-        Request request = new Request.Builder()
-                .url("https://www.googleapis.com/oauth2/v4/token")
-                .header("Content-Type", "application/x-www-form-urlencoded")
-                .post(requestBody)
-                .build();
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
 
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                try {
-                    JSONObject jsonObj = new JSONObject(response.body().string());
-                    accessToken = jsonObj.get("access_token").toString();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        });
-    }
 
 
 
@@ -261,9 +259,9 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
-    private class SectionsPagerAdapter extends FragmentStatePagerAdapter{
+    private class SectionsPagerAdapter extends FragmentPagerAdapter{
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
@@ -275,7 +273,13 @@ public class MainActivity extends AppCompatActivity
                     fragment.setLoadPop(true);
                     return fragment;
                 case 1:
-                    return ChannelActivity.PlaceholderFragment.newInstance(position);
+                    if(!Utils.getStringFromPrefs(MainActivity.this,Utils.ACCESS_TOKEN_PREF).isEmpty()){
+                        PlayListFragment fragment1 = new PlayListFragment();
+                        fragment1.setLoadLiked(true);
+                        return fragment1;
+                    }else {
+                        return ChannelActivity.PlaceholderFragment.newInstance(position);
+                    }
                 case 2:
                     return ChannelActivity.PlaceholderFragment.newInstance(position);
                 default:
@@ -289,7 +293,7 @@ public class MainActivity extends AppCompatActivity
                 case 0:
                     return "Popular";
                 case 1:
-                    return "Subscriptons";
+                    return "Liked";
                 case 2:
                     return "Account";
             }

@@ -4,33 +4,97 @@ package com.example.muffin.youtubeapp.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.example.muffin.youtubeapp.R;
+import com.example.muffin.youtubeapp.activities.MainActivity;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
+import static android.content.ContentValues.TAG;
+
 public class Utils {
 
     public static final String KIND_VIDEO = "youtube#video";
     public static final String KIND_CHANNEL = "youtube#channel";
     public static final String KIND_PLAYLIST = "youtube#playlist";
+    public static final String ACCESS_TOKEN_PREF = "access_token";
+    public static final String REFRESH_TOKEN_PREF = "refresh_token";
+    public static final String RATING_LIKE = "like";
+    public static final String RATING_DISLIKE= "dislike";
 
-    public static void writeAccessTokenToPreference(Context context,String accessToken){
+    public static void writeStringToPrefs(Context context,String key,String str){
         SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.pref_str),
                 Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString(context.getString(R.string.access_token_pref),accessToken);
+        editor.putString(ACCESS_TOKEN_PREF,str);
+        editor.apply();
         editor.commit();
     }
 
-    public static String getAccessToken(Context context){
+    public static void removeFromPrefs(Context context,String key){
+        SharedPreferences.Editor editor = context.getSharedPreferences(context.getString(R.string.pref_str),
+                Context.MODE_PRIVATE).edit();
+        editor.remove(key);
+        editor.apply();
+        editor.commit();
+    }
+
+    public static String getStringFromPrefs(Context context,String key){
         SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.pref_str),
                 Context.MODE_PRIVATE);
-        return preferences.getString(context.getString(R.string.access_token_pref),"");
+        return preferences.getString(key,"");
+    }
+
+    public static void getNewAccessToken(final Context context){
+        OkHttpClient client = new OkHttpClient();
+        RequestBody requestBody = new FormBody.Builder()
+                .add("refresh_token","1/hAog9Bpx7K3vFgxjDOMAMeygfcJTHY7e_Edrz0Ca_3k")
+                .add("client_id", context.getString(R.string.server_client_id))
+                .add("client_secret", context.getString(R.string.client_secret))
+                .add("grant_type", "refresh_token")
+                .build();
+        Request request = new Request.Builder()
+                .url("https://www.googleapis.com/oauth2/v4/token")
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .post(requestBody)
+                .build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    String str = response.body().string();
+                    JSONObject jsonObj = new JSONObject(str);
+                    Log.d("access_token",str);
+                    String accessToken = jsonObj.get("access_token").toString();
+                    Utils.writeStringToPrefs(context,Utils.ACCESS_TOKEN_PREF,accessToken);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
     }
 
 

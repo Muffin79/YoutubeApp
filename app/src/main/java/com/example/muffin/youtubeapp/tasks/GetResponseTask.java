@@ -3,6 +3,9 @@ package com.example.muffin.youtubeapp.tasks;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.IOException;
 
 import okhttp3.OkHttpClient;
@@ -11,6 +14,8 @@ import okhttp3.Response;
 
 
 public class GetResponseTask extends AsyncTask<Request,Void, Response> {
+
+    protected Gson gson = new GsonBuilder().create();
 
     @Override
     protected Response doInBackground(Request... params) {

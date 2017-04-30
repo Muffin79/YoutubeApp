@@ -40,6 +40,7 @@ public class PlayListFragment extends VideoListFragment {
     private int lastPosition = 0;
     private List<VideoItem> videoItems = new ArrayList<>();
     private boolean loadPop = false;
+    private boolean loadLiked = false;
 
     public static PlayListFragment newInstance(PlayList playList) {
         PlayListFragment fragment = new PlayListFragment();
@@ -59,6 +60,9 @@ public class PlayListFragment extends VideoListFragment {
         if(loadPop){
             loadPopularVideo();
         }
+        if(loadLiked){
+            loadLikedVideos();
+        }
 
 
         return v;
@@ -67,6 +71,10 @@ public class PlayListFragment extends VideoListFragment {
 
     public void setLoadPop(boolean loadPop) {
         this.loadPop = loadPop;
+    }
+
+    public void setLoadLiked(boolean loadLiked) {
+        this.loadLiked = loadLiked;
     }
 
     @Override
@@ -96,17 +104,17 @@ public class PlayListFragment extends VideoListFragment {
         }
     }
 
-    private void getLikedVideos(){
-        String  urlStr = Uri.parse("https://www.googleapis.com/youtube/v3/videos")
+    private void loadLikedVideos(){
+        uriBuilder = Uri.parse("https://www.googleapis.com/youtube/v3/videos")
                 .buildUpon()
                 .appendQueryParameter("key",getString(R.string.youtube_api_key))
                 .appendQueryParameter("part","snippet,contentDetails")
-                .appendQueryParameter("access_token", Utils.getAccessToken(getContext()))
+                .appendQueryParameter("access_token", Utils.getStringFromPrefs(getContext(),Utils.ACCESS_TOKEN_PREF))
                 .appendQueryParameter("myRating","like")
-                .appendQueryParameter("maxResults","10")
-                .build().toString();
+                .appendQueryParameter("maxResults","10");
+
         try {
-            URL url = new URL(urlStr);
+            URL url = new URL(uriBuilder.build().toString());
             Request request = new Request.Builder()
                     .url(url)
                     .build();

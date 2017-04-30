@@ -22,8 +22,12 @@ import com.example.muffin.youtubeapp.tasks.GetResponseTask;
 import com.example.muffin.youtubeapp.utils.Utils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
@@ -47,7 +51,7 @@ public class VideoActivity extends AppCompatActivity {
     private VideoItem videoItem;
     private String accessToken;
 
-    Gson gson = new GsonBuilder().create();
+    //Gson gson = new GsonBuilder().create();
 
     private FragmentManager fm;
     private VideoItem video;
@@ -75,6 +79,7 @@ public class VideoActivity extends AppCompatActivity {
 
         //fragmentSearch = (FragmentSearch) getSupportFragmentManager().findFragmentById(R.id.fragment_search);
         loadVideoInfo();
+        loadVideoRating();
 
         /*fragmentSearch.loadRelatedVideos(videoId);*/
         progressBar = (CircleProgressBar)findViewById(R.id.video_activity_progressBar);
@@ -84,7 +89,7 @@ public class VideoActivity extends AppCompatActivity {
                 .findFragmentById(R.id.fragment_video)).setVideoId(videoId);
         initViews();
 
-        accessToken = Utils.getAccessToken(this);
+        accessToken = Utils.getStringFromPrefs(this,Utils.ACCESS_TOKEN_PREF);
     }
 
 
@@ -131,7 +136,38 @@ public class VideoActivity extends AppCompatActivity {
         }
     }
 
+    private void loadVideoRating(){
+        String accessToken = Utils.getStringFromPrefs(this,Utils.ACCESS_TOKEN_PREF);
+        if(accessToken.isEmpty()) return;
+        String urlStr = Uri.parse("https://www.googleapis.com/youtube/v3/videos/getRating")
+                .buildUpon()
+                .appendQueryParameter("key", getString(R.string.youtube_api_key))
+                .appendQueryParameter("id", videoId)
+                .build().toString();
 
+
+    }
+
+
+    private class GetVideoRating extends GetResponseTask{
+        @Override
+        protected void onPostExecute(Response response) {
+            try {
+                JSONObject jsonObject = new JSONObject(response.body().string());
+                JSONArray ratingItems = jsonObject.getJSONArray("items");
+                JSONObject rating = ratingItems.getJSONObject(0);
+                String rateStr = rating.getString("rating");
+                if(rateStr.equals(Utils.RATING_LIKE)){
+                    likeImg.setImageResource(R.drawable.ic_like_blue_24dp);
+                }else if(rateStr.equals(Utils.RATING_DISLIKE)){
+                    dislikeImg.setImageResource(R.drawable.ic_dislike_blue_24dp);
+                }
+
+            } catch (JSONException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
     private class LoadVideoInfoTask extends GetResponseTask{
         @Override

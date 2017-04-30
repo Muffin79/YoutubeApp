@@ -4,7 +4,6 @@
     <string name="client_secret">a7FsfVozBuCc-RZjzxkyta1Q</string>
     <string name="youtube_api_key">AIzaSyBRGBdO7hA3Idfe0tP8nbFNF2pGACqK1N4</string>
     <string name="pref_str">app_pref</string>
-    <string name="access_token_pref">access_token</string>
 
 
     <!-- Date Util -->

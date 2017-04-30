@@ -18,4 +18,9 @@
         android:icon="@drawable/ic_sign_out"
         app:showAsAction="ifRoom"/>
 
+    <item
+        android:id="@+id/item_refresh"
+        android:title="refresh"
+        />
+
 </menu>
