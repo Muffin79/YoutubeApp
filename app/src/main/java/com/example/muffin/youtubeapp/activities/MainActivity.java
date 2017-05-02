@@ -1,28 +1,31 @@
 package com.example.muffin.youtubeapp.activities;
 
-import android.accounts.Account;
 import android.content.Intent;
-import android.net.Uri;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.SearchView;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.DynamicDrawableSpan;
+import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-
 import com.example.muffin.youtubeapp.R;
-import com.example.muffin.youtubeapp.fragments.PlayListFragment;
-import com.example.muffin.youtubeapp.tasks.GetResponseTask;
-import com.example.muffin.youtubeapp.utils.OnVideoSelectedListener;
+import com.example.muffin.youtubeapp.fragments.VideoListFragment;
 import com.example.muffin.youtubeapp.utils.Utils;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -31,17 +34,11 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -50,10 +47,11 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity
-        implements GoogleApiClient.OnConnectionFailedListener,
-        OnVideoSelectedListener {
 
+public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener {
+
+
+    private SectionsPagerAdapter mSectionsPagerAdapter;
 
     private final String TAG = "MainActivity";
     private final int RC_AUTH_CODE = 1;
@@ -63,9 +61,6 @@ public class MainActivity extends AppCompatActivity
     private GoogleSignInAccount account;
     private SectionsPagerAdapter adapter;
 
-    private ViewPager viewPager;
-
-
 
     private String accessToken;
     private String refreshToken;
@@ -73,12 +68,22 @@ public class MainActivity extends AppCompatActivity
     private MenuItem signIn;
     private MenuItem signOut;
 
+    /**
+     * The {@link ViewPager} that will host the section contents.
+     */
+    private ViewPager mViewPager;
+    private TabLayout.Tab []tabs = new TabLayout.Tab[3];
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        // Create the adapter that will return a fragment for each of the three
+        // primary sections of the activity.
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestServerAuthCode(getString(R.string.server_client_id))
@@ -90,46 +95,52 @@ public class MainActivity extends AppCompatActivity
                 .enableAutoManage(this,this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API,gso)
                 .build();
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
 
-        viewPager = (ViewPager)findViewById(R.id.main_viewPager);
-        adapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-        viewPager.setAdapter(adapter);
-        tabLayout.setupWithViewPager(viewPager);
-
-
-
-    }
-
-
-    private void getRecommendedVideos(){
-        String  urlStr = Uri.parse("https://www.googleapis.com/youtube/v3/activities")
-                .buildUpon()
-                .appendQueryParameter("access_token",accessToken)
-                .appendQueryParameter("mine","true")
-                .appendQueryParameter("part","snippet,contentDetails")
-                .appendQueryParameter("maxResults","10")
-                .appendQueryParameter("key",getString(R.string.youtube_api_key))
-                .build().toString();
-        try {
-            URL url = new URL(urlStr);
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
-            new GetResponseTask().execute(request);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+        for (int i = 0; i < 3; i++) {
+            tabs[i] = tabLayout.getTabAt(i);
         }
 
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                tabs[position].select();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+
+        //tabLayout.setupWithViewPager(mViewPager);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+        Utils.getNewAccessToken(this);
     }
-
-
-
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu,menu);
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+
         signIn = menu.findItem(R.id.item_login);
         signOut = menu.findItem(R.id.item_logout);
         if(Utils.getStringFromPrefs(this,Utils.ACCESS_TOKEN_PREF).isEmpty()){
@@ -153,7 +164,6 @@ public class MainActivity extends AppCompatActivity
                 return false;
             }
         });
-
 
         return true;
     }
@@ -236,9 +246,6 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-
-
-
     private void singIn() {
         Intent singInIntent = Auth.GoogleSignInApi.getSignInIntent(apiClient);
 
@@ -246,20 +253,15 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-
-
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
 
-    @Override
-    public void onVideoSelected(String videoId) {
-        Intent intent = VideoActivity.newIntent(this,videoId);
-        startActivity(intent);
-    }
 
-    private class SectionsPagerAdapter extends FragmentPagerAdapter{
+
+
+    private class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -269,12 +271,12 @@ public class MainActivity extends AppCompatActivity
         public Fragment getItem(int position) {
             switch (position){
                 case 0:
-                    PlayListFragment fragment = new PlayListFragment();
+                    VideoListFragment fragment = new VideoListFragment();
                     fragment.setLoadPop(true);
                     return fragment;
                 case 1:
                     if(!Utils.getStringFromPrefs(MainActivity.this,Utils.ACCESS_TOKEN_PREF).isEmpty()){
-                        PlayListFragment fragment1 = new PlayListFragment();
+                        VideoListFragment fragment1 = new VideoListFragment();
                         fragment1.setLoadLiked(true);
                         return fragment1;
                     }else {
@@ -288,27 +290,10 @@ public class MainActivity extends AppCompatActivity
         }
 
         @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position){
-                case 0:
-                    return "Popular";
-                case 1:
-                    return "Liked";
-                case 2:
-                    return "Account";
-            }
-            return super.getPageTitle(position);
-        }
-
-        @Override
         public int getCount() {
+            // Show 3 total pages.
             return 3;
         }
 
-
-
-
-
     }
-
 }
