@@ -1,13 +1,11 @@
 package com.example.muffin.youtubeapp.utils;
 
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.example.muffin.youtubeapp.R;
-import com.example.muffin.youtubeapp.activities.MainActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,7 +25,6 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-import static android.content.ContentValues.TAG;
 
 public class Utils {
 
@@ -35,6 +32,7 @@ public class Utils {
     public static final String KIND_CHANNEL = "youtube#channel";
     public static final String KIND_PLAYLIST = "youtube#playlist";
     public static final String ACCESS_TOKEN_PREF = "access_token";
+    public static final String CHANNEL_API_URL = "https://www.googleapis.com/youtube/v3/channels";
     public static final String REFRESH_TOKEN_PREF = "refresh_token";
     public static final String RATING_LIKE = "like";
     public static final String RATING_DISLIKE= "dislike";
@@ -115,7 +113,7 @@ public class Utils {
         DateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         try{
             result = df1.parse(date);
-            return new SimpleDateFormat("dd-MMMM-yyyy").format(result);
+            return new SimpleDateFormat("dd MMMM yyyy").format(result);
         } catch (ParseException e) {
             e.printStackTrace();
         }
