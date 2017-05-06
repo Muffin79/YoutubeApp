@@ -1,5 +1,7 @@
-package com.example.muffin.youtubeapp.GsonModels;
+package com.example.muffin.youtubeapp.GsonModels.search;
 
+
+import com.example.muffin.youtubeapp.GsonModels.Snippet;
 
 import java.io.Serializable;
 

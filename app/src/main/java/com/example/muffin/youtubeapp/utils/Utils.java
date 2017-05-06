@@ -3,6 +3,7 @@ package com.example.muffin.youtubeapp.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.util.Log;
 
 import com.example.muffin.youtubeapp.R;
@@ -24,6 +25,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+
+import static android.content.Context.CONNECTIVITY_SERVICE;
 
 
 public class Utils {
@@ -61,6 +64,7 @@ public class Utils {
     }
 
     public static void getNewAccessToken(final Context context){
+        if(!isNetworkAvailableAndConnected(context)) return;
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = new FormBody.Builder()
                 .add("refresh_token","1/hAog9Bpx7K3vFgxjDOMAMeygfcJTHY7e_Edrz0Ca_3k")
@@ -254,5 +258,14 @@ public class Utils {
             time += "00";
         }
         return time;
+    }
+
+    public static boolean isNetworkAvailableAndConnected(Context context) {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
+        boolean isNetworkAvailable = cm.getActiveNetworkInfo() != null;
+        boolean isNetworkConnected = isNetworkAvailable &&
+                cm.getActiveNetworkInfo().isConnected();
+        return isNetworkConnected;
     }
 }

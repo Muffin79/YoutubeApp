@@ -1,4 +1,4 @@
-package com.example.muffin.youtubeapp.GsonModels;
+package com.example.muffin.youtubeapp.GsonModels.search;
 
 
 import java.io.Serializable;

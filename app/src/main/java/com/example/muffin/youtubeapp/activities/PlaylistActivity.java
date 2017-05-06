@@ -12,7 +12,7 @@ public class PlaylistActivity extends AppCompatActivity {
 
     private static final String EXTRA_PLAYLIST_ID = "com.example.muffin.youtubeapp.activities.playlistid";
 
-    FragmentVideo fragmentVideo;
+    FragmentVideo mFragmentVideo;
 
     public static Intent newIntent(Context context,String playListId){
         Intent intent = new Intent(context,PlaylistActivity.class);
@@ -25,7 +25,7 @@ public class PlaylistActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist);
 
-        fragmentVideo = (FragmentVideo) getFragmentManager().findFragmentById(R.id.fragment_video);
-        fragmentVideo.setPlayListId(getIntent().getStringExtra(EXTRA_PLAYLIST_ID));
+        mFragmentVideo = (FragmentVideo) getFragmentManager().findFragmentById(R.id.fragment_video);
+        mFragmentVideo.setPlayListId(getIntent().getStringExtra(EXTRA_PLAYLIST_ID));
     }
 }

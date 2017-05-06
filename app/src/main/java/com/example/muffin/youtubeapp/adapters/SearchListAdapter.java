@@ -4,7 +4,6 @@ package com.example.muffin.youtubeapp.adapters;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.example.muffin.youtubeapp.GsonModels.SearchItem;
+import com.example.muffin.youtubeapp.GsonModels.search.SearchItem;
 import com.example.muffin.youtubeapp.R;
 import com.example.muffin.youtubeapp.activities.ChannelActivity;
 import com.example.muffin.youtubeapp.activities.PlaylistActivity;
@@ -51,45 +50,46 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.Se
 
     class SearchItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-        private Context context;
-        private SearchItem item;
-        private ImageView imgThumbnail;
-        private TextView txtTitle,txtPublishAt,txtChannelName;
+        private Context mContext;
+        private SearchItem mItem;
+        private ImageView mImgThumbnail;
+        private TextView mTxtTitle, mTxtPublishAt, mTxtChannelName;
 
 
         public SearchItemHolder(View itemView,Context context) {
             super(itemView);
-            this.context = context;
-            imgThumbnail = (ImageView)itemView.findViewById(R.id.imgThumbnail);
-            txtTitle = (TextView) itemView.findViewById(R.id.txtTitle);
-            txtPublishAt = (TextView) itemView.findViewById(R.id.txtPublishedAt);
-            txtChannelName = (TextView) itemView.findViewById(R.id.txtChannelName);
+            this.mContext = context;
+            mImgThumbnail = (ImageView)itemView.findViewById(R.id.imgThumbnail);
+            mTxtTitle = (TextView) itemView.findViewById(R.id.txtTitle);
+            mTxtPublishAt = (TextView) itemView.findViewById(R.id.txtPublishedAt);
+            mTxtChannelName = (TextView) itemView.findViewById(R.id.txtChannelName);
             itemView.setOnClickListener(this);
         }
 
         public void bindHolder(SearchItem item){
-            this.item = item;
-            txtTitle.setText(item.getSnippet().getTitle());
-            txtPublishAt.setText(Utils.formatPublishedDate(context,
+            this.mItem = item;
+            mTxtTitle.setText(item.getSnippet().getTitle());
+            mTxtPublishAt.setText(Utils.formatPublishedDate(mContext,
                     item.getSnippet().getPublishTime()));
-            txtChannelName.setText(item.getSnippet().getChannelTitle());
+            mTxtChannelName.setText(item.getSnippet().getChannelTitle());
 
-            Glide.with(context)
+            Glide.with(mContext)
                     .load(item.getSnippet().getThumbnails().getHighThumbnailUrl())
                     .centerCrop()
                     .placeholder(R.drawable.loading_spinner)
-                    .into(imgThumbnail);
+                    .into(mImgThumbnail);
         }
 
         @Override
         public void onClick(View v) {
-            if(item.getId().getKind().equals(Utils.KIND_VIDEO)) {
-                Intent intent = VideoActivity.newIntent(context, item.getId().getVideoId());
-                context.startActivity(intent);
-            }else if(item.getId().getKind().equals(Utils.KIND_CHANNEL)){
-                context.startActivity(ChannelActivity.newIntent(context,item.getId().getChannelId()));
-            }else if(item.getId().getKind().equals(Utils.KIND_PLAYLIST)){
-                context.startActivity(PlaylistActivity.newIntent(context,item.getId().getPlaylistId()));
+            if(mItem.getId().getKind().equals(Utils.KIND_VIDEO)) {
+                Intent intent = VideoActivity.newIntent(mContext, mItem.getId().getVideoId());
+                mContext.startActivity(intent);
+            }else if(mItem.getId().getKind().equals(Utils.KIND_CHANNEL)){
+                mContext.startActivity(ChannelActivity.newIntent(mContext, mItem.getId().getChannelId()
+                                                            , mItem.getSnippet().getTitle()));
+            }else if(mItem.getId().getKind().equals(Utils.KIND_PLAYLIST)){
+                mContext.startActivity(PlaylistActivity.newIntent(mContext, mItem.getId().getPlaylistId()));
             }
         }
     }

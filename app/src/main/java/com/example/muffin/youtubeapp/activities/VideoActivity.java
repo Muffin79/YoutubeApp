@@ -4,35 +4,26 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.muffin.youtubeapp.GsonModels.PlayList;
-import com.example.muffin.youtubeapp.GsonModels.VideoItem;
+import com.example.muffin.youtubeapp.GsonModels.video.PlayList;
+import com.example.muffin.youtubeapp.GsonModels.video.VideoItem;
 import com.example.muffin.youtubeapp.R;
-import com.example.muffin.youtubeapp.fragments.FragmentSearch;
 import com.example.muffin.youtubeapp.fragments.FragmentVideo;
 import com.example.muffin.youtubeapp.tasks.GetResponseTask;
 import com.example.muffin.youtubeapp.utils.Utils;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 
 import okhttp3.Request;
 import okhttp3.Response;
@@ -42,32 +33,27 @@ public class VideoActivity extends AppCompatActivity {
             "com.example.muffin.youtubeapp.activities.extra_video_id";
 
 
-    public static Intent newIntent(Context context,String videoID){
-        Intent intent = new Intent(context,VideoActivity.class);
-        intent.putExtra(EXTRA_VIDEO_ID,videoID);
+    public static Intent newIntent(Context context, String videoID) {
+        Intent intent = new Intent(context, VideoActivity.class);
+        intent.putExtra(EXTRA_VIDEO_ID, videoID);
         return intent;
     }
 
-    private VideoItem videoItem;
-    private String accessToken;
+    private VideoItem mVideoItem;
+    private String mAccessToken;
 
-    //Gson gson = new GsonBuilder().create();
+    private String mVideoId;
 
-    private FragmentManager fm;
-    private VideoItem video;
-    private String videoId;
-    //private FragmentSearch fragmentSearch;
-
-    private ImageView likeImg;
-    private ImageView dislikeImg;
-    private ImageView shareImg;
-    private TextView publishTimeTxt;
-    private TextView viewCountTxt;
-    private TextView titleTxt;
-    private TextView likeCountTxt;
-    private TextView dislikeCountTxt;
-    private TextView channelNameTxt;
-    private CircleProgressBar progressBar;
+    private ImageView mLikeImg;
+    private ImageView mDislikeImg;
+    private ImageView mShareImg;
+    private TextView mPublishTimeTxt;
+    private TextView mViewCountTxt;
+    private TextView mTitleTxt;
+    private TextView mLikeCountTxt;
+    private TextView mDislikeCountTxt;
+    private TextView mChannelNameTxt;
+    private CircleProgressBar mProgressbar;
 
 
     @Override
@@ -75,92 +61,95 @@ public class VideoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video);
 
-        videoId = getIntent().getStringExtra(EXTRA_VIDEO_ID);
+        mVideoId = getIntent().getStringExtra(EXTRA_VIDEO_ID);
 
         //fragmentSearch = (FragmentSearch) getSupportFragmentManager().findFragmentById(R.id.fragment_search);
         loadVideoInfo();
-        loadVideoRating();
+        if (!Utils.getStringFromPrefs(this, Utils.ACCESS_TOKEN_PREF).isEmpty())
+            loadVideoRating();
 
         /*fragmentSearch.loadRelatedVideos(videoId);*/
-        progressBar = (CircleProgressBar)findViewById(R.id.video_activity_progressBar);
-        progressBar.setColorSchemeColors(Color.RED);
+        mProgressbar = (CircleProgressBar) findViewById(R.id.video_activity_progressBar);
+        mProgressbar.setColorSchemeColors(Color.RED);
 
-        ((FragmentVideo)getFragmentManager()
-                .findFragmentById(R.id.fragment_video)).setVideoId(videoId);
+        ((FragmentVideo) getFragmentManager()
+                .findFragmentById(R.id.fragment_video)).setVideoId(mVideoId);
         initViews();
 
-        accessToken = Utils.getStringFromPrefs(this,Utils.ACCESS_TOKEN_PREF);
+        mAccessToken = Utils.getStringFromPrefs(this, Utils.ACCESS_TOKEN_PREF);
     }
 
 
-
-    private void initViews(){
-        likeImg = (ImageView) findViewById(R.id.icon_like);
-        dislikeImg = (ImageView) findViewById(R.id.icon_dislike);
-        shareImg = (ImageView) findViewById(R.id.icon_share);
-        shareImg.setOnClickListener(new View.OnClickListener() {
+    private void initViews() {
+        mLikeImg = (ImageView) findViewById(R.id.icon_like);
+        mDislikeImg = (ImageView) findViewById(R.id.icon_dislike);
+        mShareImg = (ImageView) findViewById(R.id.icon_share);
+        mShareImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("text/plain");
                 String urlStr = Uri.parse("https://www.youtube.com/watch").buildUpon()
-                        .appendQueryParameter("v",videoId)
+                        .appendQueryParameter("v", mVideoId)
                         .build().toString();
-                intent.putExtra(Intent.EXTRA_TEXT,urlStr);
+                intent.putExtra(Intent.EXTRA_TEXT, urlStr);
                 startActivity(intent);
             }
         });
-        viewCountTxt = (TextView) findViewById(R.id.views_txt);
-        titleTxt = (TextView) findViewById(R.id.title_txt);
-        likeCountTxt = (TextView) findViewById(R.id.like_count_txt);
-        dislikeCountTxt = (TextView) findViewById(R.id.dislike_count_txt);
-        channelNameTxt = (TextView) findViewById(R.id.chanel_name_txt);
-        publishTimeTxt = (TextView) findViewById(R.id.publishedAt_txt);
+        mViewCountTxt = (TextView) findViewById(R.id.views_txt);
+        mTitleTxt = (TextView) findViewById(R.id.title_txt);
+        mLikeCountTxt = (TextView) findViewById(R.id.like_count_txt);
+        mDislikeCountTxt = (TextView) findViewById(R.id.dislike_count_txt);
+        mChannelNameTxt = (TextView) findViewById(R.id.chanel_name_txt);
+        mPublishTimeTxt = (TextView) findViewById(R.id.publishedAt_txt);
     }
 
-    private void loadVideoInfo(){
+    private void loadVideoInfo() {
         String urlStr = Uri.parse("https://www.googleapis.com/youtube/v3/videos")
                 .buildUpon()
                 .appendQueryParameter("key", getString(R.string.youtube_api_key))
                 .appendQueryParameter("part", "snippet,contentDetails,statistics")
-                .appendQueryParameter("id", videoId)
+                .appendQueryParameter("id", mVideoId)
                 .appendQueryParameter("maxResults", "1").build().toString();
-        try {
-            URL url = new URL(urlStr);
-            Request request = new Request.Builder()
-                    .url(url)
-                    .build();
-            new LoadVideoInfoTask().execute(request);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+        Request request = new Request.Builder()
+                .url(urlStr)
+                .build();
+        new LoadVideoInfoTask().execute(request);
+
     }
 
-    private void loadVideoRating(){
-        String accessToken = Utils.getStringFromPrefs(this,Utils.ACCESS_TOKEN_PREF);
-        if(accessToken.isEmpty()) return;
+    private void loadVideoRating() {
+        String accessToken = Utils.getStringFromPrefs(this, Utils.ACCESS_TOKEN_PREF);
+        if (accessToken.isEmpty()) return;
         String urlStr = Uri.parse("https://www.googleapis.com/youtube/v3/videos/getRating")
                 .buildUpon()
                 .appendQueryParameter("key", getString(R.string.youtube_api_key))
-                .appendQueryParameter("id", videoId)
+                .appendQueryParameter("id", mVideoId)
+                .appendQueryParameter("access_token",
+                        Utils.getStringFromPrefs(this, Utils.ACCESS_TOKEN_PREF))
                 .build().toString();
+        Request request = new Request.Builder()
+                .url(urlStr)
+                .build();
+        new GetVideoRating().execute(request);
 
 
     }
 
 
-    private class GetVideoRating extends GetResponseTask{
+    private class GetVideoRating extends GetResponseTask {
         @Override
         protected void onPostExecute(Response response) {
             try {
-                JSONObject jsonObject = new JSONObject(response.body().string());
+                String str = response.body().string();
+                JSONObject jsonObject = new JSONObject(str);
                 JSONArray ratingItems = jsonObject.getJSONArray("items");
                 JSONObject rating = ratingItems.getJSONObject(0);
                 String rateStr = rating.getString("rating");
-                if(rateStr.equals(Utils.RATING_LIKE)){
-                    likeImg.setImageResource(R.drawable.ic_like_blue_24dp);
-                }else if(rateStr.equals(Utils.RATING_DISLIKE)){
-                    dislikeImg.setImageResource(R.drawable.ic_dislike_blue_24dp);
+                if (rateStr.equals(Utils.RATING_LIKE)) {
+                    mLikeImg.setImageResource(R.drawable.ic_like_blue_24dp);
+                } else if (rateStr.equals(Utils.RATING_DISLIKE)) {
+                    mDislikeImg.setImageResource(R.drawable.ic_dislike_blue_24dp);
                 }
 
             } catch (JSONException | IOException e) {
@@ -169,26 +158,26 @@ public class VideoActivity extends AppCompatActivity {
         }
     }
 
-    private class LoadVideoInfoTask extends GetResponseTask{
+    private class LoadVideoInfoTask extends GetResponseTask {
         @Override
         protected void onPostExecute(Response response) {
             try {
                 String str = response.body().string();
-                Log.d("FragmentSearch",str);
-                PlayList playList = gson.fromJson(str,PlayList.class);
-                videoItem = playList.getItems().get(0);
-                titleTxt.setText(videoItem.getSnippet().getTitle());
-                viewCountTxt.setText(getString(R.string.views_count,
-                        String.valueOf(videoItem.getViewCount())));
-                likeCountTxt.setText(String.valueOf(videoItem.getLikeCount()));
-                dislikeCountTxt.setText(String.valueOf(videoItem.getDislikeCount()));
-                channelNameTxt.setText(videoItem.getSnippet().getChannelTitle());
-                progressBar.setVisibility(View.GONE);
-                publishTimeTxt.setText(getString(R.string.publish_on,
-                        Utils.getFormatedDate(videoItem.getSnippet().getPublishTime())));
+                Log.d("FragmentSearch", str);
+                PlayList playList = mGson.fromJson(str, PlayList.class);
+                mVideoItem = playList.getItems().get(0);
+                mTitleTxt.setText(mVideoItem.getSnippet().getTitle());
+                mViewCountTxt.setText(getString(R.string.views_count,
+                        String.valueOf(mVideoItem.getVideoStatistic().getViewCount())));
+                mLikeCountTxt.setText(String.valueOf(mVideoItem.getVideoStatistic().getLikeCount()));
+                mDislikeCountTxt.setText(String.valueOf(mVideoItem.getVideoStatistic().getDislikeCount()));
+                mChannelNameTxt.setText(mVideoItem.getSnippet().getChannelTitle());
+                mProgressbar.setVisibility(View.GONE);
+                mPublishTimeTxt.setText(getString(R.string.publish_on,
+                        Utils.getFormatedDate(mVideoItem.getSnippet().getPublishTime())));
                 findViewById(R.id.info_linear_layout).setVisibility(View.VISIBLE);
-                ((TextView)findViewById(R.id.description_txt))
-                        .setText(videoItem.getSnippet().getDescription());
+                ((TextView) findViewById(R.id.description_txt))
+                        .setText(mVideoItem.getSnippet().getDescription());
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -1,7 +1,6 @@
 package com.example.muffin.youtubeapp.activities;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -15,10 +14,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.style.DynamicDrawableSpan;
-import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,6 +34,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -57,28 +53,28 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     private final int RC_AUTH_CODE = 1;
     private final String VIDEO_ID_KEY ="video_id";
 
-    private GoogleApiClient apiClient;
-    private GoogleSignInAccount account;
-    private SectionsPagerAdapter adapter;
+    private GoogleApiClient mApiClient;
+    private GoogleSignInAccount mAccount;
+    private SectionsPagerAdapter mAdapter;
 
 
-    private String accessToken;
-    private String refreshToken;
+    private String mAccessToken;
+    private String mRefreshToken;
     private String tokenType;
-    private MenuItem signIn;
-    private MenuItem signOut;
+    private MenuItem mSignIn;
+    private MenuItem mSignOut;
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
-    private TabLayout.Tab []tabs = new TabLayout.Tab[3];
+    private TabLayout.Tab [] mTabs = new TabLayout.Tab[3];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        Utils.getNewAccessToken(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
@@ -91,14 +87,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 .requestScopes(new Scope("https://www.googleapis.com/auth/youtube"))
                 .build();
 
-        apiClient = new GoogleApiClient.Builder(this)
+        mApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this,this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API,gso)
                 .build();
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
 
         for (int i = 0; i < 3; i++) {
-            tabs[i] = tabLayout.getTabAt(i);
+            mTabs[i] = tabLayout.getTabAt(i);
         }
 
         // Set up the ViewPager with the sections adapter.
@@ -112,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
             @Override
             public void onPageSelected(int position) {
-                tabs[position].select();
+                mTabs[position].select();
             }
 
             @Override
@@ -132,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                         .setAction("Action", null).show();
             }
         });
-        Utils.getNewAccessToken(this);
+
     }
 
 
@@ -141,14 +137,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_menu, menu);
 
-        signIn = menu.findItem(R.id.item_login);
-        signOut = menu.findItem(R.id.item_logout);
+        mSignIn = menu.findItem(R.id.item_login);
+        mSignOut = menu.findItem(R.id.item_logout);
         if(Utils.getStringFromPrefs(this,Utils.ACCESS_TOKEN_PREF).isEmpty()){
-            signIn.setVisible(true);
-            signOut.setVisible(false);
+            mSignIn.setVisible(true);
+            mSignOut.setVisible(false);
         }else{
-            signIn.setVisible(false);
-            signOut.setVisible(true);
+            mSignIn.setVisible(false);
+            mSignOut.setVisible(true);
         }
 
         SearchView searchView = (SearchView) menu.findItem(R.id.menu_item_search).getActionView();
@@ -176,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 //item.setVisible(false);
                 break;
             case R.id.item_logout:
-                Auth.GoogleSignInApi.signOut(apiClient);
+                Auth.GoogleSignInApi.signOut(mApiClient);
                 changeSingInItemsVisible();
                 Utils.removeFromPrefs(this,Utils.ACCESS_TOKEN_PREF);
                 break;
@@ -187,8 +183,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     }
 
     private void changeSingInItemsVisible(){
-        signIn.setVisible(!signIn.isVisible());
-        signOut.setVisible(!signOut.isVisible());
+        mSignIn.setVisible(!mSignIn.isVisible());
+        mSignOut.setVisible(!mSignOut.isVisible());
     }
 
     @Override
@@ -196,8 +192,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         if(requestCode == RC_AUTH_CODE){
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if(result.isSuccess()){
-                account = result.getSignInAccount();
-                String authCode = account.getServerAuthCode();
+                mAccount = result.getSignInAccount();
+                String authCode = mAccount.getServerAuthCode();
                 changeSingInItemsVisible();
                 getAccessToken(authCode);
             }
@@ -231,12 +227,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     String str = response.body().string();
                     JSONObject jsonObj = new JSONObject(str);
                     Log.d("access_token",str);
-                    accessToken = jsonObj.get("access_token").toString();
-                    Utils.writeStringToPrefs(MainActivity.this,Utils.ACCESS_TOKEN_PREF,accessToken);
+                    mAccessToken = jsonObj.get("access_token").toString();
+                    Utils.writeStringToPrefs(MainActivity.this,Utils.ACCESS_TOKEN_PREF, mAccessToken);
                     tokenType = jsonObj.get("token_type").toString();
-                    refreshToken = jsonObj.get("refresh_token").toString();
-                    Utils.writeStringToPrefs(MainActivity.this,Utils.REFRESH_TOKEN_PREF,refreshToken);
-                    adapter.notifyAll();
+                    mRefreshToken = jsonObj.get("refresh_token").toString();
+                    Utils.writeStringToPrefs(MainActivity.this,Utils.REFRESH_TOKEN_PREF, mRefreshToken);
+                    mAdapter.notifyAll();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -247,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
 
     private void singIn() {
-        Intent singInIntent = Auth.GoogleSignInApi.getSignInIntent(apiClient);
+        Intent singInIntent = Auth.GoogleSignInApi.getSignInIntent(mApiClient);
 
         startActivityForResult(singInIntent,RC_AUTH_CODE);
     }
@@ -262,6 +258,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
 
     private class SectionsPagerAdapter extends FragmentPagerAdapter {
+        private VideoListFragment mFragmentPop, mFragmentLiked;
+
 
         SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -271,14 +269,22 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         public Fragment getItem(int position) {
             switch (position){
                 case 0:
-                    VideoListFragment fragment = new VideoListFragment();
-                    fragment.setLoadPop(true);
-                    return fragment;
+                    if(mFragmentPop == null){
+                        mFragmentPop = new VideoListFragment();
+                        mFragmentPop.setLoadPop(true);
+                    }
+                    /*VideoListFragment fragment = new VideoListFragment();
+                    fragment.setLoadPop(true);*/
+                    return mFragmentPop;
                 case 1:
                     if(!Utils.getStringFromPrefs(MainActivity.this,Utils.ACCESS_TOKEN_PREF).isEmpty()){
-                        VideoListFragment fragment1 = new VideoListFragment();
-                        fragment1.setLoadLiked(true);
-                        return fragment1;
+                        /*VideoListFragment fragment1 = new VideoListFragment();
+                        fragment1.setLoadLiked(true);*/
+                        if(mFragmentLiked == null) {
+                            mFragmentLiked = new VideoListFragment();
+                            mFragmentLiked.setLoadLiked(true);
+                        }
+                        return mFragmentLiked;
                     }else {
                         return ChannelActivity.PlaceholderFragment.newInstance(position);
                     }
@@ -288,6 +294,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     return ChannelActivity.PlaceholderFragment.newInstance(position);
             }
         }
+
 
         @Override
         public int getCount() {

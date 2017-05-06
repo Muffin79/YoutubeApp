@@ -6,15 +6,13 @@ import com.example.muffin.youtubeapp.R;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerFragment;
-import com.google.android.youtube.player.YouTubeThumbnailLoader;
-import com.google.android.youtube.player.YouTubeThumbnailView;
 
 public class FragmentVideo extends YouTubePlayerFragment implements
         YouTubePlayer.OnInitializedListener{
 
-    private YouTubePlayer player;
-    private String videoId;
-    private String playListId;
+    private YouTubePlayer mPlayer;
+    private String mVideoId;
+    private String mPlayListId;
 
 
     @Override
@@ -27,52 +25,52 @@ public class FragmentVideo extends YouTubePlayerFragment implements
 
     @Override
     public void onDestroy() {
-        if(player != null){
-            player.release();
+        if(mPlayer != null){
+            mPlayer.release();
         }
         super.onDestroy();
     }
 
     @Override
     public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean b) {
-        player = youTubePlayer;
+        mPlayer = youTubePlayer;
 
-        if(!b && videoId != null){
-            player.cueVideo(videoId);
+        if(!b && mVideoId != null){
+            mPlayer.cueVideo(mVideoId);
         }
 
-        if(!b && playListId != null){
-            player.cuePlaylist(playListId);
+        if(!b && mPlayListId != null){
+            mPlayer.cuePlaylist(mPlayListId);
         }
 
 
-        player.play();
+        mPlayer.play();
     }
 
     @Override
     public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult youTubeInitializationResult) {
-        player = null;
+        mPlayer = null;
     }
 
     public void setVideoId(String videoId) {
-        if (videoId != null && !videoId.equals(this.videoId)) {
-            this.videoId = videoId;
-            if (player != null) {
-                player.cueVideo(videoId);
+        if (videoId != null && !videoId.equals(this.mVideoId)) {
+            this.mVideoId = videoId;
+            if (mPlayer != null) {
+                mPlayer.cueVideo(videoId);
             }
         }
     }
 
     public void setPlayListId(String playListId) {
-        if(playListId != null && !playListId.equals(this.playListId)) {
-            this.playListId = playListId;
-            if(player != null){
-                player.cuePlaylist(playListId);
+        if(playListId != null && !playListId.equals(this.mPlayListId)) {
+            this.mPlayListId = playListId;
+            if(mPlayer != null){
+                mPlayer.cuePlaylist(playListId);
             }
         }
     }
 
     public String getVideoId() {
-        return videoId;
+        return mVideoId;
     }
 }

@@ -3,6 +3,7 @@
     package="com.example.muffin.youtubeapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission  android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:allowBackup="true"
@@ -13,7 +14,9 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".activities.MainActivity"
-            android:screenOrientation="portrait">
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -35,7 +38,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.muffin.youtubeapp.activities.MainActivity" />
         </activity>
-        <activity android:name=".activities.PlaylistActivity"></activity>
+        <activity android:name=".activities.PlaylistActivity" />
     </application>
 
 </manifest>

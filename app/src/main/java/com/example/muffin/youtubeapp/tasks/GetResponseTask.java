@@ -15,7 +15,7 @@ import okhttp3.Response;
 
 public class GetResponseTask extends AsyncTask<Request,Void, Response> {
 
-    protected Gson gson = new GsonBuilder().create();
+    protected Gson mGson = new GsonBuilder().create();
 
     @Override
     protected Response doInBackground(Request... params) {

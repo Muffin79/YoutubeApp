@@ -3,6 +3,7 @@
     <dimen name="standard_margin">16dp</dimen>
     <dimen name="icon_margin">50dp</dimen>
     <dimen name="icon_size">24dp</dimen>
+    <dimen name="channel_about_item_margin">10dp</dimen>
     <!-- Adapter item sizes -->
     <dimen name="thumbnail_width">120dp</dimen>
     <dimen name="thumbnail_height">96dp</dimen>

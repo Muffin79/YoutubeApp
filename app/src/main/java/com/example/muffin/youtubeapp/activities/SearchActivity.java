@@ -3,25 +3,22 @@ package com.example.muffin.youtubeapp.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 
-import com.example.muffin.youtubeapp.GsonModels.SearchList;
+import com.example.muffin.youtubeapp.GsonModels.search.SearchList;
 import com.example.muffin.youtubeapp.R;
 import com.example.muffin.youtubeapp.fragments.FragmentSearch;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 
 public class SearchActivity extends AppCompatActivity {
     private static final String EXTRA_QUERY = "com.example.muffin.youtubeapp.activities.extra_query";
     private final String TAG = "SearchActivity";
 
-    private FragmentSearch fragment;
-    private SearchList searchList;
+    private FragmentSearch mFragment;
+    private SearchList mSearchList;
     //private Gson gson = new GsonBuilder().create();
 
     public static Intent newIntent(Context context,String q){
@@ -37,8 +34,8 @@ public class SearchActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         final String q = getIntent().getStringExtra(EXTRA_QUERY);
-        fragment = (FragmentSearch) getSupportFragmentManager().findFragmentById(R.id.search_fragment_container);
-        fragment.loadVideosByQuery(q);
+        mFragment = (FragmentSearch) getSupportFragmentManager().findFragmentById(R.id.search_fragment_container);
+        mFragment.loadVideosByQuery(q);
     }
 
     @Override
@@ -50,7 +47,7 @@ public class SearchActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                fragment.loadVideosByQuery(query);
+                mFragment.loadVideosByQuery(query);
                 return true;
             }
 

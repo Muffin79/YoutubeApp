@@ -1,6 +1,8 @@
-package com.example.muffin.youtubeapp.GsonModels;
+package com.example.muffin.youtubeapp.GsonModels.video;
 
 
+import com.example.muffin.youtubeapp.GsonModels.ContentDetails;
+import com.example.muffin.youtubeapp.GsonModels.Snippet;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;

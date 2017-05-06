@@ -1,9 +1,9 @@
-package com.example.muffin.youtubeapp.GsonModels;
+package com.example.muffin.youtubeapp.GsonModels.video;
 
 
 
 
-class Statistic {
+public class Statistic {
 
     private long viewCount;
     private long likeCount;
