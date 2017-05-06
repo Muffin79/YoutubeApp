@@ -2,6 +2,7 @@ package com.example.muffin.youtubeapp.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -23,14 +24,27 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
+import com.example.muffin.youtubeapp.GsonModels.channel.ChannelItem;
+import com.example.muffin.youtubeapp.GsonModels.channel.ChannelList;
 import com.example.muffin.youtubeapp.R;
+import com.example.muffin.youtubeapp.fragments.ChannelAboutFragment;
 import com.example.muffin.youtubeapp.fragments.FragmentSearch;
+import com.example.muffin.youtubeapp.tasks.GetResponseTask;
+import com.example.muffin.youtubeapp.utils.Utils;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import java.io.IOException;
+
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class ChannelActivity extends AppCompatActivity {
 
     private final String TAG = "ChannelActivity";
 
     private static final String EXTRA_CHANNEL_ID = "com.example.muffin.youtubeapp.activities.CHANNEL_ID";
+    private static final String EXTRA_CHANNEL_NAME= "com.example.muffin.youtubeapp.activities.CHANNEL_NAME";
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -41,7 +55,7 @@ public class ChannelActivity extends AppCompatActivity {
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
-    public static Intent newIntent(Context context,String channelId){
+    public static Intent newIntent(Context context,String channelId,String channelName){
         Intent intent = new Intent(context,ChannelActivity.class);
         intent.putExtra(EXTRA_CHANNEL_ID,channelId);
         return intent;
@@ -51,7 +65,8 @@ public class ChannelActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
-    private String channelId;
+    private ChannelItem mChannelItem;
+    private String mChannelId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +80,8 @@ public class ChannelActivity extends AppCompatActivity {
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        channelId = getIntent().getStringExtra(EXTRA_CHANNEL_ID);
+        mChannelId = getIntent().getStringExtra(EXTRA_CHANNEL_ID);
+         toolbar.setTitle(getIntent().getStringExtra(EXTRA_CHANNEL_NAME));
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
@@ -108,6 +124,8 @@ public class ChannelActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
 
     /**
      * A placeholder fragment containing a simple view.
@@ -156,25 +174,23 @@ public class ChannelActivity extends AppCompatActivity {
         }
 
 
+
+
         @Override
         public Fragment getItem(int position) {
             String type;
             switch (position){
                 case 0:
-                        Log.d(TAG,"case 0");
-                    return FragmentSearch.newInstance(channelId,FragmentSearch.TYPE_VIDEO);
+                    return FragmentSearch.newInstance(mChannelId,FragmentSearch.TYPE_VIDEO);
                 case 1:
-                        Log.d(TAG, "case 1");
-                    return FragmentSearch.newInstance(channelId,FragmentSearch.TYPE_PLAYLIST);
+                    return FragmentSearch.newInstance(mChannelId,FragmentSearch.TYPE_PLAYLIST);
                     //return FragmentSearch.newInstance(channelId,FragmentSearch.TYPE_PLAYLIST);
                 case 2:
-                        Log.d(TAG, "case 2");
-                       return PlaceholderFragment.newInstance(position);
-
+                       return ChannelAboutFragment.newInstance(mChannelId);
             }
 
 
-           return FragmentSearch.newInstance(channelId,FragmentSearch.TYPE_VIDEO);
+           return FragmentSearch.newInstance(mChannelId,FragmentSearch.TYPE_VIDEO);
         }
 
         @Override
