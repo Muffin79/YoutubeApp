@@ -22,6 +22,7 @@ import com.example.muffin.youtubeapp.utils.Utils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import okhttp3.Request;
 import okhttp3.Response;
@@ -31,12 +32,16 @@ import okhttp3.Response;
  */
 public class VideoListFragment extends ItemListFragment {
 
+    private static final String SEARCH_API_URL = "https://www.googleapis.com/youtube/v3/videos";
     private static final String ARGS_VIDEO_LIST = "argument_video_list";
+    private static final String TAG = "VideoListFragment";
 
 
     private int mLastPosition = 0;
     private List<VideoItem> mVideoItems = new ArrayList<>();
+    //If set loading popular videos when fragment created.
     private boolean mLoadPop = false;
+    //If set loading liked videos when fragment created.
     private boolean mLoadLiked = false;
 
     public static VideoListFragment newInstance(PlayList playList) {
@@ -52,6 +57,7 @@ public class VideoListFragment extends ItemListFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = super.onCreateView(inflater, container, savedInstanceState);
+        Log.d(TAG,"onCreateView");
 
         Button retry = (Button) v.findViewById(R.id.raisedRetry);
         retry.setOnClickListener(new View.OnClickListener() {
@@ -65,15 +71,19 @@ public class VideoListFragment extends ItemListFragment {
         return v;
     }
 
+    /**Loading items if have internet connection.*/
     private void beginLoading() {
         if (Utils.isNetworkAvailableAndConnected(getContext())) {
             mRecyclerView.setVisibility(View.VISIBLE);
             mRetryLayout.setVisibility(View.GONE);
             if (mLoadPop) {
+                Log.d(TAG,"Start loading pop");
                 loadPopularVideo();
+                mLoadPop = false;
             }
             if (mLoadLiked) {
                 loadLikedVideos();
+                mLoadLiked = false;
             }
         }
 
@@ -94,6 +104,7 @@ public class VideoListFragment extends ItemListFragment {
     }
 
 
+    /**Load popular videoItems using {@link LoadVideoItemTask}.*/
     public void loadPopularVideo() {
         startLoadingAnim();
         mUriBuilder = Uri.parse("https://www.googleapis.com/youtube/v3/videos")
@@ -101,6 +112,7 @@ public class VideoListFragment extends ItemListFragment {
                 .appendQueryParameter("key", getString(R.string.youtube_api_key))
                 .appendQueryParameter("part", "snippet,contentDetails")
                 .appendQueryParameter("chart", "mostpopular")
+                .appendQueryParameter("regionCode", "ru")
                 .appendQueryParameter("maxResults", "50");
 
             Request request = new Request.Builder()
@@ -109,6 +121,7 @@ public class VideoListFragment extends ItemListFragment {
             new LoadVideoItemTask().execute(request);
     }
 
+    /**Load liked videoItems using {@link LoadVideoItemTask}.*/
     private void loadLikedVideos() {
         mUriBuilder = Uri.parse("https://www.googleapis.com/youtube/v3/videos")
                 .buildUpon()
@@ -152,6 +165,10 @@ public class VideoListFragment extends ItemListFragment {
         mRecyclerView.scrollToPosition(mLastPosition);
     }
 
+    /**
+     * A {@link GetResponseTask} that get response with list of video items.Items add
+     * to list of {@link VideoItem}.
+     */
     private class LoadVideoItemTask extends GetResponseTask {
         @Override
         protected void onPostExecute(Response response) {
@@ -164,11 +181,15 @@ public class VideoListFragment extends ItemListFragment {
                 endLoadingAnim();
                 mAdapter.notifyDataSetChanged();
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(TAG,Log.getStackTraceString(e));
             }
         }
     }
 
+    /**
+     * A {@link GetResponseTask} that get response with next list of video items.Items add
+     * to list of {@link VideoItem}.
+     */
     private class LoadNewVideoTask extends GetResponseTask {
         @Override
         protected void onPostExecute(Response response) {
@@ -181,7 +202,7 @@ public class VideoListFragment extends ItemListFragment {
                 int itemCount = playList.getItems().size();
                 mAdapter.notifyItemRangeInserted(mVideoItems.size() - itemCount, itemCount);
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(TAG,Log.getStackTraceString(e));
             }
         }
     }

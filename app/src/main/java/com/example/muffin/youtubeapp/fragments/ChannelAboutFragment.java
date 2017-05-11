@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.example.muffin.youtubeapp.GsonModels.channel.ChannelItem;
 import com.example.muffin.youtubeapp.GsonModels.channel.ChannelList;
 import com.example.muffin.youtubeapp.R;
+import com.example.muffin.youtubeapp.activities.ChannelActivity;
 import com.example.muffin.youtubeapp.tasks.GetResponseTask;
 import com.example.muffin.youtubeapp.utils.Utils;
 
@@ -23,7 +24,7 @@ import okhttp3.Response;
 
 /**
  * A simple {@link Fragment} subclass that contains info
- * about channel
+ * about channel.
  */
 public class ChannelAboutFragment extends Fragment {
 
@@ -33,6 +34,7 @@ public class ChannelAboutFragment extends Fragment {
     private ChannelItem mChannelItem;
     private TextView mTxtDescription, mTxtJoined, mTxtViewCount, mTxtSubscribersCount;
 
+    /**Returns new instance of {@link ChannelAboutFragment} with channel id in arguments.*/
     public static ChannelAboutFragment newInstance(String id){
         Bundle args = new Bundle();
         args.putString(KEY_CHANNEL_ID,id);
@@ -45,7 +47,7 @@ public class ChannelAboutFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+        // Inflate the layout for this fragment.
         View v = inflater.inflate(R.layout.fragment_channel_about, container, false);
 
         mTxtDescription = (TextView)v.findViewById(R.id.description_txt);
@@ -60,6 +62,7 @@ public class ChannelAboutFragment extends Fragment {
         return v;
     }
 
+    /**Load info about channel with {@link GetChannelInfoTask}.*/
     private void loadChannelInfo(String channelId){
         String urlStr = Uri.parse(Utils.CHANNEL_API_URL)
                 .buildUpon()
@@ -74,14 +77,17 @@ public class ChannelAboutFragment extends Fragment {
         new GetChannelInfoTask().execute(request);
     }
 
+    /**
+     * A {@link GetResponseTask} that get response with information about channel put it in
+     * {@link ChannelItem} and bind UI components of fragment.
+     */
     private class GetChannelInfoTask extends GetResponseTask {
         @Override
         protected void onPostExecute(Response response) {
             try {
                 String str = response.body().string();
-                Log.d("ChannelActivity",str);
+                Log.d(ChannelActivity.TAG,str);
                 ChannelList list = mGson.fromJson(str,ChannelList.class);
-                Log.d("ChannelActivity","List size " + list.getItems().size());
                 mChannelItem = list.getItems().get(0);
                 //txtDescription.setText(channelItem.getSnippet().getDescription());
                 mTxtJoined.setText(getString(R.string.joined,
@@ -91,9 +97,9 @@ public class ChannelAboutFragment extends Fragment {
                 mTxtSubscribersCount.setText(getString(R.string.subscribers_count,
                         String.valueOf(mChannelItem.getStatistic().getSubscriberCount())));
             } catch (IOException e) {
-                //Log.d(TAG,"Response is not valid");
+                Log.e(ChannelActivity.TAG,"Response is not valid");
             }catch(NullPointerException e){
-                Log.d("ChannelActivity",Log.getStackTraceString(e));
+                Log.e(ChannelActivity.TAG,Log.getStackTraceString(e));
 
             }
         }

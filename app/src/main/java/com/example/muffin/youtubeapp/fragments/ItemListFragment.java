@@ -19,22 +19,27 @@ import com.example.muffin.youtubeapp.utils.OnVideoSelectedListener;
 import com.example.muffin.youtubeapp.utils.Utils;
 import com.lsjwzh.widget.materialloadingprogressbar.CircleProgressBar;
 
-
+/**A {@link Fragment} that contains recyclerView and have loading animations.*/
 public abstract class ItemListFragment extends Fragment{
     private final String TAG = "ItemListFragment";
+
+
 
     protected RecyclerView.Adapter mAdapter;
     protected OnVideoSelectedListener mCallback;
     protected RecyclerView mRecyclerView;
     protected TextView mLoadMoreTxt;
     protected CircleProgressBar mProgressBar;
+    //Layout that visible when device don`t have internet connection.
     protected LinearLayout mRetryLayout;
 
     protected String mNextPageToken = "";
 
+    //Using to build url for request.
     protected Uri.Builder mUriBuilder;
 
     protected abstract RecyclerView.Adapter createAdapter();
+
 
     @Nullable
     @Override
@@ -64,6 +69,7 @@ public abstract class ItemListFragment extends Fragment{
             mProgressBar.setVisibility(View.GONE);
             mRecyclerView.setVisibility(View.GONE);
         }
+
 
 
         return v;

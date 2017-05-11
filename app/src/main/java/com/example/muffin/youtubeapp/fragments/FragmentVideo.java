@@ -31,6 +31,7 @@ public class FragmentVideo extends YouTubePlayerFragment implements
         super.onDestroy();
     }
 
+    /**When initialized set video or playlist to player*/
     @Override
     public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer youTubePlayer, boolean b) {
         mPlayer = youTubePlayer;

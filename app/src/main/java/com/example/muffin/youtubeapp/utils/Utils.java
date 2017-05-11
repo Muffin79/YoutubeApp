@@ -30,16 +30,22 @@ import static android.content.Context.CONNECTIVITY_SERVICE;
 
 
 public class Utils {
-
+    //Kinds of youtube content
     public static final String KIND_VIDEO = "youtube#video";
     public static final String KIND_CHANNEL = "youtube#channel";
     public static final String KIND_PLAYLIST = "youtube#playlist";
+    //SharedPreferences keys
     public static final String ACCESS_TOKEN_PREF = "access_token";
-    public static final String CHANNEL_API_URL = "https://www.googleapis.com/youtube/v3/channels";
     public static final String REFRESH_TOKEN_PREF = "refresh_token";
+    //Api urls
+    public static final String CHANNEL_API_URL = "https://www.googleapis.com/youtube/v3/channels";
+
+    //Rating strings
     public static final String RATING_LIKE = "like";
     public static final String RATING_DISLIKE= "dislike";
+    public static final String RATING_NONE = "none";
 
+    /**Write some string to preferences by key.*/
     public static void writeStringToPrefs(Context context,String key,String str){
         SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.pref_str),
                 Context.MODE_PRIVATE);
@@ -49,6 +55,7 @@ public class Utils {
         editor.commit();
     }
 
+    /**Remove value from application preferences.*/
     public static void removeFromPrefs(Context context,String key){
         SharedPreferences.Editor editor = context.getSharedPreferences(context.getString(R.string.pref_str),
                 Context.MODE_PRIVATE).edit();
@@ -57,12 +64,14 @@ public class Utils {
         editor.commit();
     }
 
+    /**Return string from preferences by key.*/
     public static String getStringFromPrefs(Context context,String key){
         SharedPreferences preferences = context.getSharedPreferences(context.getString(R.string.pref_str),
                 Context.MODE_PRIVATE);
         return preferences.getString(key,"");
     }
 
+    /**Refresh access token.*/
     public static void getNewAccessToken(final Context context){
         if(!isNetworkAvailableAndConnected(context)) return;
         OkHttpClient client = new OkHttpClient();
@@ -99,7 +108,7 @@ public class Utils {
         });
     }
 
-
+    /**Return a date in format how much time ago was it was.*/
     public static String formatPublishedDate(Context context, String publishedDate){
         Date result = new Date();
         DateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -112,6 +121,7 @@ public class Utils {
         return getTimeAgo(result, context);
     }
 
+    /**Format date from string to format dd MMMM yyyy.*/
     public static String getFormatedDate(String date){
         Date result = new Date();
         DateFormat df1 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
@@ -124,13 +134,13 @@ public class Utils {
         return "";
     }
 
-    // Method to get current date
+    /** Method to get current date.*/
     public static Date currentDate() {
         Calendar calendar = Calendar.getInstance();
         return calendar.getTime();
     }
 
-    // Method to get how many time ago
+    /** Method to get how many time ago.*/
     public static String getTimeAgo(Date date, Context ctx) {
 
         if(date == null) {
@@ -197,13 +207,13 @@ public class Utils {
         return timeAgo + " " + ctx.getResources().getString(R.string.date_util_suffix);
     }
 
-    // Method to get time distance in minute
+    /** Method to get time distance in minute.*/
     private static int getTimeDistanceInMinutes(long time) {
         long timeDistance = currentDate().getTime() - time;
         return Math.round((Math.abs(timeDistance) / 1000) / 60);
     }
 
-    // Method to convert ISO 8601 time to string
+    /** Method to convert ISO 8601 time to string.*/
     public static String getTimeFromString(String duration) {
         // TODO Auto-generated method stub
         String time = "";
@@ -260,6 +270,7 @@ public class Utils {
         return time;
     }
 
+    /**Check internet connection.*/
     public static boolean isNetworkAvailableAndConnected(Context context) {
         ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);

@@ -21,6 +21,9 @@ import com.example.muffin.youtubeapp.utils.Utils;
 
 import java.util.List;
 
+/**
+ * A {@link RecyclerView.Adapter} for items that get from search
+ * */
 public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.SearchItemHolder>{
     private final String TAG = "SearchListAdapter";
     private List<SearchItem> items;
@@ -48,6 +51,9 @@ public class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.Se
         return items.size();
     }
 
+    /**
+     * A {@link RecyclerView.ViewHolder} that contains info about {@link SearchItem}
+     * */
     class SearchItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         private Context mContext;

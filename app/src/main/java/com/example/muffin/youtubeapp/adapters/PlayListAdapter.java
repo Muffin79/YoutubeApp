@@ -19,15 +19,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Adapter using for create list item, for youtube playList
+ * A {@link RecyclerView.Adapter} using for create list items, for youtube playList
  */
-
 public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHolder> {
 
     private final static String TAG = "PlayListAdapter";
 
 
     private List<VideoItem> mItems = new ArrayList<>();
+    private int mLastPosition = 5;
 
     public PlayListAdapter(List<VideoItem> items){
         this.mItems = items;
@@ -43,6 +43,9 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.bindHolder(mItems.get(position));
+
+        if(position > mLastPosition){
+        }
     }
 
 
@@ -52,6 +55,9 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
         return mItems.size();
     }
 
+    /**
+     * A {@link ViewHolder} that contains info about {@link VideoItem}
+     * */
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
         private Context mContext;
@@ -71,6 +77,7 @@ public class PlayListAdapter extends RecyclerView.Adapter<PlayListAdapter.ViewHo
             mTxtChannelName = (TextView) itemView.findViewById(R.id.txtChannelName);
         }
 
+        /**Bind UI components of holder*/
         void bindHolder(VideoItem item){
             this.mItem = item;
             Log.d(TAG,"Title : " + item.getSnippet().getTitle());

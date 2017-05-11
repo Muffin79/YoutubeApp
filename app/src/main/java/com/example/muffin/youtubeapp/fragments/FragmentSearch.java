@@ -29,9 +29,11 @@ public class FragmentSearch extends ItemListFragment {
     private final String TAG = "FragmentSearch";
     private final String SEARCH_API_URL = "https://www.googleapis.com/youtube/v3/search";
 
+    //Types of content.
     public static final String TYPE_VIDEO = "video";
     public static final String TYPE_PLAYLIST = "playlist";
 
+    //Key for put and read values from arguments of fragment.
     private static final String ARG_SEARCH_LIST = "search_list";
     private static final String ARG_QUERY = "query";
     private static final String ARG_CHANNEL = "channelId";
@@ -46,10 +48,16 @@ public class FragmentSearch extends ItemListFragment {
         return fragment;
     }
 
-
+    //List that contains info for bind recyclerView.
     private List<SearchItem> mSearchItems = new ArrayList<>();
+
+    //If set fragment load channel content when create.
     private boolean mLoadChannel = false;
 
+    /**
+     * Returns a new instance of {@link FragmentSearch} with channel id and type of content that
+     * will be loaded in arguments.
+     */
     public static FragmentSearch newInstance(String channelId, String type) {
         FragmentSearch fragmentSearch = new FragmentSearch();
         Bundle args = new Bundle();
@@ -65,6 +73,8 @@ public class FragmentSearch extends ItemListFragment {
         return new SearchListAdapter(mSearchItems, mCallback);
     }
 
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -76,7 +86,7 @@ public class FragmentSearch extends ItemListFragment {
         return v;
     }
 
-
+    /**Load search items by query with {@link SearchVideoTask}.*/
     public void loadVideosByQuery(String q) {
         if (!Utils.isNetworkAvailableAndConnected(getContext())) return;
         startLoadingAnim();
@@ -93,6 +103,7 @@ public class FragmentSearch extends ItemListFragment {
                 .build();
         new SearchVideoTask().execute(request);
     }
+
 
     public void loadRelatedVideos(String videoId) {
         if (!Utils.isNetworkAvailableAndConnected(getContext())) return;
@@ -128,6 +139,7 @@ public class FragmentSearch extends ItemListFragment {
         mLoadChannel = b;
     }
 
+    /**Load channel content certain type using {@link SearchVideoTask}.*/
     public void loadChannelContent(String channelId, String type) {
         Log.d(TAG, "channelVideosLoad");
         startLoadingAnim();
@@ -147,25 +159,31 @@ public class FragmentSearch extends ItemListFragment {
     }
 
 
+    /**
+     * A {@link GetResponseTask} that get response with list of search items and
+     * bind adapter with them.
+     */
     public class SearchVideoTask extends GetResponseTask {
         @Override
         protected void onPostExecute(Response response) {
-            Log.d(TAG, "Search task executed");
             try {
                 String str = response.body().string();
                 mSearchItems.clear();
                 SearchList list = mGson.fromJson(str, SearchList.class);
                 mSearchItems.addAll(list.getItems());
-                Log.d(TAG, "List size " + mSearchItems.size());
                 mNextPageToken = list.getNextPageToken();
                 endLoadingAnim();
                 mAdapter.notifyDataSetChanged();
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(TAG,Log.getStackTraceString(e));
             }
         }
     }
 
+    /**
+     * A {@link GetResponseTask} that get response with list of search new search items.Items add
+     * to list of {@linkplain SearchItem}..
+     */
     private class LoadNewVideoTask extends GetResponseTask {
         @Override
         protected void onPostExecute(Response response) {
@@ -177,7 +195,7 @@ public class FragmentSearch extends ItemListFragment {
                 endLoadingAnim();
                 mAdapter.notifyItemRangeInserted(mSearchItems.size() - c, c);
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.e(TAG,Log.getStackTraceString(e));
             }
         }
     }

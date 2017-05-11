@@ -41,10 +41,11 @@ import okhttp3.Response;
 
 public class ChannelActivity extends AppCompatActivity {
 
-    private final String TAG = "ChannelActivity";
+    public static final String TAG = "ChannelActivity";
 
     private static final String EXTRA_CHANNEL_ID = "com.example.muffin.youtubeapp.activities.CHANNEL_ID";
-    private static final String EXTRA_CHANNEL_NAME= "com.example.muffin.youtubeapp.activities.CHANNEL_NAME";
+    private static final String EXTRA_CHANNEL_NAME = "com.example.muffin.youtubeapp.activities.CHANNEL_NAME";
+    private static final String EXTRA_CHANNEL_ITEM = "com.example.muffin.youtubeapp.activities.CHANNEL_ITEM";
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -55,6 +56,7 @@ public class ChannelActivity extends AppCompatActivity {
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
+    /*Returns new intent to start ChannelActivity with channel name and id in extras.*/
     public static Intent newIntent(Context context,String channelId,String channelName){
         Intent intent = new Intent(context,ChannelActivity.class);
         intent.putExtra(EXTRA_CHANNEL_ID,channelId);
@@ -166,8 +168,7 @@ public class ChannelActivity extends AppCompatActivity {
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-
-    public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
