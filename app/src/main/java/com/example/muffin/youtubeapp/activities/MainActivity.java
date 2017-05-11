@@ -1,6 +1,7 @@
 package com.example.muffin.youtubeapp.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -20,7 +21,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.muffin.youtubeapp.R;
+import com.example.muffin.youtubeapp.fragments.FragmentSubscriptions;
 import com.example.muffin.youtubeapp.fragments.VideoListFragment;
+import com.example.muffin.youtubeapp.tasks.GetResponseTask;
 import com.example.muffin.youtubeapp.utils.Utils;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -74,7 +77,9 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Utils.getNewAccessToken(this);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
@@ -114,18 +119,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             @Override
             public void onPageScrollStateChanged(int state) {
 
-            }
-        });
-
-
-        //tabLayout.setupWithViewPager(mViewPager);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
             }
         });
 
@@ -200,6 +193,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
         }
     }
 
+    /*Send request to get accessToken for user and save it to preferences*/
     private void getAccessToken(String authCode){
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = new FormBody.Builder()
@@ -234,14 +228,14 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     Utils.writeStringToPrefs(MainActivity.this,Utils.REFRESH_TOKEN_PREF, mRefreshToken);
                     mAdapter.notifyAll();
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    Log.e(TAG,Log.getStackTraceString(e));
                 }
 
             }
         });
     }
 
-
+    /*Send intent to authorize user*/
     private void singIn() {
         Intent singInIntent = Auth.GoogleSignInApi.getSignInIntent(mApiClient);
 
@@ -256,8 +250,12 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
 
 
 
-
+    /**
+     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
+     * one of the sections/tabs/pages.
+     */
     private class SectionsPagerAdapter extends FragmentPagerAdapter {
+
         private VideoListFragment mFragmentPop, mFragmentLiked;
 
 
@@ -270,6 +268,7 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
             switch (position){
                 case 0:
                     if(mFragmentPop == null){
+                        Log.d(TAG,"Create fragment pop!");
                         mFragmentPop = new VideoListFragment();
                         mFragmentPop.setLoadPop(true);
                     }
@@ -277,6 +276,8 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     fragment.setLoadPop(true);*/
                     return mFragmentPop;
                 case 1:
+                    return new FragmentSubscriptions();
+                case 2:
                     if(!Utils.getStringFromPrefs(MainActivity.this,Utils.ACCESS_TOKEN_PREF).isEmpty()){
                         /*VideoListFragment fragment1 = new VideoListFragment();
                         fragment1.setLoadLiked(true);*/
@@ -288,8 +289,6 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                     }else {
                         return ChannelActivity.PlaceholderFragment.newInstance(position);
                     }
-                case 2:
-                    return ChannelActivity.PlaceholderFragment.newInstance(position);
                 default:
                     return ChannelActivity.PlaceholderFragment.newInstance(position);
             }
