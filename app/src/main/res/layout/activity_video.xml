@@ -53,7 +53,7 @@
                 android:textSize="@dimen/small_text" />
 
             <GridLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:columnCount="3"
@@ -136,6 +136,9 @@
 
             <TextView
                 android:id="@+id/description_txt"
+                android:autoLink="web"
+                android:textColorLink="@color/links_color"
+                android:linksClickable="true"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp" />
